@@ -17,10 +17,11 @@ import java.util.stream.Stream;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class WorkerGroupCreationEvent extends Event {
     @ManyToOne
     private Worker brigadier;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Worker> workers;
     Instant groupActiveFrom;
     Instant groupActiveTo;
@@ -28,6 +29,11 @@ public class WorkerGroupCreationEvent extends Event {
 
     @Override
     public SystemState updateState(SystemState oldState) {
+        System.out.println("in update state of WorkerGroupCreationEvent with id " + getId() + " and workers:");
+        for (Worker worker : workers) {
+            System.out.println(worker.getId() + ": " + worker.getName());
+        }
+
         if (groupActiveFrom.isAfter(oldState.getTimestamp()))
             return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
                     new Group(workers, brigadier)
