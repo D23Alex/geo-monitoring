@@ -6,13 +6,13 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Entity
 @Getter
 @Setter
-@MappedSuperclass
+@Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Event {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant timestamp;
 
