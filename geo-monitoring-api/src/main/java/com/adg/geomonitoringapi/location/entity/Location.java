@@ -1,13 +1,11 @@
 package com.adg.geomonitoringapi.location.entity;
 
-import com.adg.geomonitoringapi.worker.entity.Worker;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,5 +22,4 @@ public class Location {
 
     @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Point> points;
-
 }
