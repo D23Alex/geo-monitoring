@@ -1,7 +1,17 @@
 package com.adg.geomonitoringapi.model;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Set;
 
-public record Group(Set<Worker> workers, Worker brigadier) {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public final class Group {
+    private Set<Worker> workers;
+    private Worker brigadier;
 }

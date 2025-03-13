@@ -4,21 +4,20 @@ import com.adg.geomonitoringapi.model.Group;
 import com.adg.geomonitoringapi.model.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkerGroupCreationEvent extends Event {
-    @Id
-    private Long id;
     @ManyToOne
     private Worker brigadier;
     @OneToMany
@@ -29,21 +28,21 @@ public class WorkerGroupCreationEvent extends Event {
 
     @Override
     public SystemState updateState(SystemState oldState) {
-        if (groupActiveFrom.isAfter(oldState.timestamp()))
-            return new SystemState(Stream.concat(oldState.futureGroups().stream(), Stream.of(
+        if (groupActiveFrom.isAfter(oldState.getTimestamp()))
+            return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
                     new Group(workers, brigadier)
             )).collect(Collectors.toSet()),
-                    oldState.activeGroups(),
-                    oldState.idleWorkers(),
-                    oldState.timestamp());
+                    oldState.getActiveGroups(),
+                    oldState.getIdleWorkers(),
+                    oldState.getTimestamp());
 
-        if (groupActiveFrom.isBefore(oldState.timestamp()) && groupActiveTo.isAfter(oldState.timestamp()))
-            return new SystemState(Stream.concat(oldState.futureGroups().stream(), Stream.of(
+        if (groupActiveFrom.isBefore(oldState.getTimestamp()) && groupActiveTo.isAfter(oldState.getTimestamp()))
+            return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
                     new Group(workers, brigadier)
             )).collect(Collectors.toSet()),
-                    oldState.activeGroups(),
-                    oldState.idleWorkers(),
-                    oldState.timestamp());
+                    oldState.getActiveGroups(),
+                    oldState.getIdleWorkers(),
+                    oldState.getTimestamp());
 
         return new SystemState(null, null, null, null);
     }
