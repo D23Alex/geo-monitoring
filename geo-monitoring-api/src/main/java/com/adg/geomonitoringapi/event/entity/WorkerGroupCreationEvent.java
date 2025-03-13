@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Builder
 public class WorkerGroupCreationEvent extends Event {
     @ManyToOne
-    private Worker brigadier;
+    private Worker foreman;
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Worker> workers;
     Instant groupActiveFrom;
@@ -36,7 +36,7 @@ public class WorkerGroupCreationEvent extends Event {
 
         if (groupActiveFrom.isAfter(oldState.getTimestamp()))
             return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
-                    new Group(workers, brigadier)
+                    new Group(workers, foreman)
             )).collect(Collectors.toSet()),
                     oldState.getActiveGroups(),
                     oldState.getIdleWorkers(),
@@ -45,7 +45,7 @@ public class WorkerGroupCreationEvent extends Event {
 
         if (groupActiveFrom.isBefore(oldState.getTimestamp()) && groupActiveTo.isAfter(oldState.getTimestamp()))
             return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
-                    new Group(workers, brigadier)
+                    new Group(workers, foreman)
             )).collect(Collectors.toSet()),
                     oldState.getActiveGroups(),
                     oldState.getIdleWorkers(),
