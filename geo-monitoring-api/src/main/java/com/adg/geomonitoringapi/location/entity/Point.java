@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table
 public class Point {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
