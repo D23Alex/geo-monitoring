@@ -2,7 +2,7 @@ package com.adg.geomonitoringapi.task.controller;
 
 import com.adg.geomonitoringapi.event.entity.TaskAssignedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCreatedEvent;
-import com.adg.geomonitoringapi.event.entity.TaskClosedEvent;
+import com.adg.geomonitoringapi.event.entity.TaskCompletedEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.state.SystemState;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class TaskController {
 
     // Закрытие задачи (например, выполнена или отозвана)
     @PostMapping("/{taskId}/close")
-    public String closeTask(@PathVariable Long taskId, @RequestBody TaskClosedEvent event) {
+    public String closeTask(@PathVariable Long taskId, @RequestBody TaskCompletedEvent event) {
         event.setTaskId(taskId);
         eventRepository.save(event);
         return "Task closed event saved";

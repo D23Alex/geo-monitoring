@@ -12,18 +12,17 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TaskClosedEvent extends Event {
+public class TaskCompletedEvent extends Event {
     private Long taskId;
     private String closingReason;
     // Новый статус задачи: COMPLETED или CANCELLED
-    private TaskStatus closedStatus;
     private Instant closedAt;
 
     @Override
     public SystemState updateState(SystemState oldState) {
         Set<Task> updatedTasks = oldState.getTasks().stream().map(task -> {
             if (task.getId().equals(taskId)) {
-                task.setStatus(closedStatus);
+                task.setStatus(TaskStatus.COMPLETED);
                 task.setClosingReason(closingReason);
                 task.setClosedAt(closedAt != null ? closedAt : getTimestamp());
             }

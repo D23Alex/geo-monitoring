@@ -21,7 +21,8 @@ import java.time.Instant;
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerGroupCreationEvent.class, name = "WorkerGroupCreationEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCreatedEvent.class, name = "TaskCreatedEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskAssignedEvent.class, name = "TaskAssignedEvent"),
-        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskClosedEvent.class, name = "TaskClosedEvent"),
+        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCompletedEvent.class, name = "TaskCompletedEvent"),
+        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCancelledEvent.class, name = "TaskCancelledEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.AbnormalSituationEvent.class, name = "AbnormalSituationEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.ForemanAssignmentEvent.class, name = "ForemanAssignmentEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent.class, name = "WorkerPositionUpdateEvent")
