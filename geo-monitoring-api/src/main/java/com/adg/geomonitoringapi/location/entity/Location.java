@@ -13,6 +13,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,12 +1,16 @@
 package com.adg.geomonitoringapi.snapshot.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table
 public class Snapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
