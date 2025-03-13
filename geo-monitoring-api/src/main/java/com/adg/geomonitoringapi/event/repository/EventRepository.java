@@ -6,7 +6,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
 
-@NoRepositoryBean
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByOrderByTimestampAsc();
 }

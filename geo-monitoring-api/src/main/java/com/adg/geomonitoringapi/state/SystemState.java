@@ -1,6 +1,7 @@
 package com.adg.geomonitoringapi.state;
 
 import com.adg.geomonitoringapi.group.entity.Group;
+import com.adg.geomonitoringapi.task.entity.Task;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +19,10 @@ public final class SystemState {
     private Set<Group> futureGroups;
     private Set<Group> activeGroups;
     private Set<Worker> idleWorkers;
+    private Set<Task> tasks;
     private Instant timestamp;
 
     public static SystemState initial() {
-        return new SystemState(Set.of(), Set.of(), Set.of(), Instant.now());
+        return new SystemState(Set.of(), Set.of(), Set.of(), Set.of(), Instant.now());
     }
 }

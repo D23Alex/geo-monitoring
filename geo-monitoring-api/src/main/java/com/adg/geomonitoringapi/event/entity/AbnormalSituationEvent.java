@@ -1,0 +1,18 @@
+package com.adg.geomonitoringapi.event.entity;
+
+import com.adg.geomonitoringapi.state.SystemState;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class AbnormalSituationEvent extends Event {
+    private String description; // описание внештатной ситуации
+
+    @Override
+    public SystemState updateState(SystemState oldState) {
+        // В данной простой реализации состояние не изменяется,
+        // но в полном варианте можно добавить список событий с внештатными ситуациями в state.
+        return oldState;
+    }
+}
