@@ -1,12 +1,11 @@
 package com.adg.geomonitoringapi.state;
 
-import com.adg.geomonitoringapi.model.Group;
-import com.adg.geomonitoringapi.model.Worker;
+import com.adg.geomonitoringapi.group.entity.Group;
+import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.repository.NoRepositoryBean;
 
 import java.time.Instant;
 import java.util.Set;

@@ -1,5 +1,6 @@
-package com.adg.geomonitoringapi.model;
+package com.adg.geomonitoringapi.group.entity;
 
+import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

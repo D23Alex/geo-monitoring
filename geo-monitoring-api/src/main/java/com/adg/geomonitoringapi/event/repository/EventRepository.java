@@ -1,6 +1,6 @@
-package com.adg.geomonitoringapi.repository;
+package com.adg.geomonitoringapi.event.repository;
 
-import com.adg.geomonitoringapi.event.Event;
+import com.adg.geomonitoringapi.event.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 

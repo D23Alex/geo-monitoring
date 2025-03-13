@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.model;
+package com.adg.geomonitoringapi.worker.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.event;
+package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.*;

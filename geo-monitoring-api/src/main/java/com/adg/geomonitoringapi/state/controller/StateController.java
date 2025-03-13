@@ -1,6 +1,6 @@
-package com.adg.geomonitoringapi.controller;
+package com.adg.geomonitoringapi.state.controller;
 
-import com.adg.geomonitoringapi.service.StateService;
+import com.adg.geomonitoringapi.state.service.StateService;
 import com.adg.geomonitoringapi.state.SystemState;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
