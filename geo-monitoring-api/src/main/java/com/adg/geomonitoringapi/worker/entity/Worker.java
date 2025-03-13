@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder;
 
 @Entity
 @Getter
@@ -13,7 +12,6 @@ import lombok.Builder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-@Builder
 public class Worker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
