@@ -40,6 +40,7 @@ public class WorkerGroupCreationEvent extends Event {
             )).collect(Collectors.toSet()),
                     oldState.getActiveGroups(),
                     oldState.getIdleWorkers(),
+                    oldState.getTasks(),
                     oldState.getTimestamp());
 
         if (groupActiveFrom.isBefore(oldState.getTimestamp()) && groupActiveTo.isAfter(oldState.getTimestamp()))
@@ -48,8 +49,9 @@ public class WorkerGroupCreationEvent extends Event {
             )).collect(Collectors.toSet()),
                     oldState.getActiveGroups(),
                     oldState.getIdleWorkers(),
+                    oldState.getTasks(),
                     oldState.getTimestamp());
 
-        return new SystemState(null, null, null, null);
+        return new SystemState(null, null, null, null, null);
     }
 }
