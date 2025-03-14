@@ -1,15 +1,14 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.event.Group;
+import com.adg.geomonitoringapi.state.GroupState;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.Hashtable;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -29,24 +28,22 @@ public class WorkerGroupCreationEvent extends Event {
 
     @Override
     public SystemState updateState(SystemState oldState) {
-        if (groupActiveFrom.isAfter(oldState.getTimestamp()))
-            return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
-                    new Group(workers, foreman)
-            )).collect(Collectors.toSet()),
-                    oldState.getActiveGroups(),
-                    oldState.getIdleWorkers(),
-                    oldState.getTasks(),
-                    oldState.getTimestamp());
+        GroupState newGroup = GroupState.builder()
+                .workers(workers)
+                .foreman(foreman)
+                .activeFrom(groupActiveFrom)
+                .activeTo(groupActiveTo)
+                .createdAt(getTimestamp())
+                .build();
 
-        if (groupActiveFrom.isBefore(oldState.getTimestamp()) && groupActiveTo.isAfter(oldState.getTimestamp()))
-            return new SystemState(Stream.concat(oldState.getFutureGroups().stream(), Stream.of(
-                    new Group(workers, foreman)
-            )).collect(Collectors.toSet()),
-                    oldState.getActiveGroups(),
-                    oldState.getIdleWorkers(),
-                    oldState.getTasks(),
-                    oldState.getTimestamp());
+        Long newGroupId = getId();
+        if (oldState.getTasks().containsKey(newGroupId))
+            throw new SystemState.StateUpdateException("Невозможно создать группу: группа с id "
+                    + newGroupId + " уже существует");
 
-        return new SystemState(null, null, null, null, null);
+        var newGroups = new Hashtable<>(oldState.getGroups());
+        newGroups.put(newGroupId, newGroup);
+
+        return oldState.withGroups(newGroups);
     }
 }

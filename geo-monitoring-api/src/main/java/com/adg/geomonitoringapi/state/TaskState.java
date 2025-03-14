@@ -1,9 +1,8 @@
-package com.adg.geomonitoringapi.event;
+package com.adg.geomonitoringapi.state;
 
+import com.adg.geomonitoringapi.event.TaskStatus;
 import com.adg.geomonitoringapi.worker.entity.Worker;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -12,11 +11,10 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+@Builder
+@With
+public class TaskState {
     private String description;
-    // Опциональная геолокация
-    private Double latitude;
-    private Double longitude;
     // Работники, назначенные на задачу
     private Set<Worker> assignedWorkers = new HashSet<>();
     private TaskStatus status;
@@ -25,4 +23,6 @@ public class Task {
     private Instant createdAt;
     private Instant closedAt;
     private String closingReason;
+
+
 }

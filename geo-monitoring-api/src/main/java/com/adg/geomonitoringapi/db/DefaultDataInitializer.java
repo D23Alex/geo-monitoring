@@ -35,8 +35,8 @@ public class DefaultDataInitializer {
                 .workers(Set.of(worker2, worker3))
                 .groupActiveFrom(Instant.now().minusMillis(10000))
                 .groupActiveTo(Instant.now().plusMillis(10000))
-                .timestamp(Instant.now())
                 .build();
+        event.setTimestamp(Instant.now());
 
         eventRepository.save(event);
 
