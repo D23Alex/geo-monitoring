@@ -5,16 +5,14 @@ import com.adg.geomonitoringapi.event.entity.TaskCreatedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCompletedEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.state.SystemState;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/tasks")
 public class TaskController {
     private final EventRepository eventRepository;
-
-    public TaskController(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
 
     // Создание задачи (бригадир)
     @PostMapping
@@ -26,9 +24,7 @@ public class TaskController {
     // Назначение задачи работнику
     @PostMapping("/{taskId}/assign")
     public String assignTask(@PathVariable Long taskId, @RequestBody TaskAssignedEvent event) {
-        //TODO: это больше не работает: event.setTaskId(taskId);
-        eventRepository.save(event);
-        return "Task assigned event saved";
+      return null;
     }
 
     // Закрытие задачи (например, выполнена или отозвана)
