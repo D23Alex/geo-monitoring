@@ -2,6 +2,7 @@ package com.adg.geomonitoringapi.event.controller;
 
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,13 +14,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/reports")
 public class ReportController {
     private final EventRepository eventRepository;
-
-    public ReportController(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
 
     // Получение статистики по задачам за указанный период (ADMIN)
     @GetMapping("/tasks")
