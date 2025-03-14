@@ -3,12 +3,14 @@ package com.adg.geomonitoringapi.state;
 import com.adg.geomonitoringapi.group.entity.Group;
 import com.adg.geomonitoringapi.task.entity.Task;
 import com.adg.geomonitoringapi.worker.entity.Worker;
+import com.adg.geomonitoringapi.worker.state.WorkerState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -21,6 +23,7 @@ public final class SystemState {
     private Set<Worker> idleWorkers;
     private Set<Task> tasks;
     private Instant timestamp;
+    //todo: добавить private Map<Worker, WorkerState> workerStates;
 
     public static SystemState initial() {
         return new SystemState(Set.of(), Set.of(), Set.of(), Set.of(), Instant.now());
