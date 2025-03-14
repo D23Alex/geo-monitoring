@@ -1,6 +1,6 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.event.SystemState;
+import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.event.SystemState;
+import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.event.Task;
 import com.adg.geomonitoringapi.event.TaskStatus;
 import jakarta.persistence.Entity;

@@ -4,7 +4,7 @@ import com.adg.geomonitoringapi.event.entity.TaskAssignedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCreatedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCompletedEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
-import com.adg.geomonitoringapi.event.SystemState;
+import com.adg.geomonitoringapi.state.SystemState;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

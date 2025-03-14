@@ -1,5 +1,7 @@
 package com.adg.geomonitoringapi.geometry;
 
+import com.adg.geomonitoringapi.event.Point;
+
 public class Geometry {
     private static final double R = 6371.0; // Радиус Земли в километрах
 
@@ -17,5 +19,9 @@ public class Geometry {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c;
+    }
+
+    public static Double haversine(Point p1, Point p2) {
+        return haversine(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
     }
 }
