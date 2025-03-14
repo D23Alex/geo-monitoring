@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class LocationCreationEventCreationDTO extends AbstractEventCreationDTO {
+public class LocationCreationEventCreationDTO extends EventCreationDTO {
     private String name;
     private Set<Point> points;
 }

@@ -14,9 +14,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TaskCreatedEventCreationDTO extends AbstractEventCreationDTO {
+public class TaskCreatedEventCreationDTO extends EventCreationDTO {
     private String description;
-    private Double latitude; 
+    private Double latitude;
     private Double longitude;
     private String completionCriteria;
     private Instant createdAt;

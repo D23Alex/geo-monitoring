@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class AbnormalSituationEventCreationDTO extends AbstractEventCreationDTO {
+public class AbnormalSituationEventCreationDTO extends EventCreationDTO {
     private WorkerResponseDTO worker;
     private String description;
 }

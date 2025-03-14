@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TaskCreatedEventResponseDTO extends AbstractEventResponseDTO {
+public class TaskCreatedEventResponseDTO extends EventResponseDTO {
     private String description;
     private Double latitude;
     private Double longitude;

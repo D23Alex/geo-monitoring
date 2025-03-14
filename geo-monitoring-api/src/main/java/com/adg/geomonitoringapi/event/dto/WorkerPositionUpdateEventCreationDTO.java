@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WorkerPositionUpdateEventCreationDTO extends AbstractEventCreationDTO {
+public class WorkerPositionUpdateEventCreationDTO extends EventCreationDTO {
     private Long workerId;
     private double latitude;
     private double longitude;

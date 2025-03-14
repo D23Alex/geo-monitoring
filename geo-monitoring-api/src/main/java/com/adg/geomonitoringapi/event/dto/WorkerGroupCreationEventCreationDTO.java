@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class WorkerGroupCreationEventCreationDTO extends AbstractEventCreationDTO {
+public class WorkerGroupCreationEventCreationDTO extends EventCreationDTO {
     private WorkerResponseDTO foreman;
     private Set<WorkerResponseDTO> workers;
     Instant groupActiveFrom;

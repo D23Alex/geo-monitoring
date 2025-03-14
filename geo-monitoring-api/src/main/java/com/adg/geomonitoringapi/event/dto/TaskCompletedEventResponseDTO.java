@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TaskCompletedEventResponseDTO extends AbstractEventResponseDTO {
+public class TaskCompletedEventResponseDTO extends EventResponseDTO {
     private String closingReason;
     private Instant closedAt;
 }

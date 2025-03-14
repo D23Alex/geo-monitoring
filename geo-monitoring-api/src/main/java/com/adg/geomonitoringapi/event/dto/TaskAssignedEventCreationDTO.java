@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TaskAssignedEventCreationDTO extends AbstractEventCreationDTO {
+public class TaskAssignedEventCreationDTO extends EventCreationDTO {
     private Long workerId;
     private String description;
     private Set<Long> assignedWorkerIds;
