@@ -26,7 +26,7 @@ public class TaskController {
     // Назначение задачи работнику
     @PostMapping("/{taskId}/assign")
     public String assignTask(@PathVariable Long taskId, @RequestBody TaskAssignedEvent event) {
-        event.setTaskId(taskId);
+        //TODO: это больше не работает: event.setTaskId(taskId);
         eventRepository.save(event);
         return "Task assigned event saved";
     }

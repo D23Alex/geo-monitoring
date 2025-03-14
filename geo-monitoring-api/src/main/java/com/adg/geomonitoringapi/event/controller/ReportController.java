@@ -32,11 +32,11 @@ public class ReportController {
                         (s, e) -> e.updateState(s),
                         (s1, s2) -> s2);
 
-        long totalTasks = state.getTasks().stream()
+        long totalTasks = state.getTasks().values().stream()
                 .filter(task -> task.getCreatedAt().isAfter(from) && task.getCreatedAt().isBefore(to))
                 .count();
 
-        long completedTasks = state.getTasks().stream()
+        long completedTasks = state.getTasks().values().stream()
                 .filter(task -> task.getStatus().name().equals("COMPLETED"))
                 .filter(task -> task.getClosedAt() != null &&
                         task.getClosedAt().isAfter(from) &&
@@ -54,7 +54,7 @@ public class ReportController {
                         (s, e) -> e.updateState(s),
                         (s1, s2) -> s2);
 
-        Map<String, Long> statusCount = state.getTasks().stream()
+        Map<String, Long> statusCount = state.getTasks().values().stream()
                 .collect(Collectors.groupingBy(task -> task.getStatus().name(), Collectors.counting()));
 
         return Map.of("progress", statusCount);

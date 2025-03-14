@@ -1,7 +1,6 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.event.Task;
-import com.adg.geomonitoringapi.event.TaskStatus;
+import com.adg.geomonitoringapi.state.TaskState;
 import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -17,7 +16,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-public class TaskCreatedEvent extends Event {
+public class TaskCreatedEvent extends Event { // TODO: удалить, дублирует TaskAssignedEvent
     private Long taskId;
     private String description;
     private Double latitude; // опционально
@@ -27,26 +26,6 @@ public class TaskCreatedEvent extends Event {
 
     @Override
     public SystemState updateState(SystemState oldState) {
-        Task task = new Task();
-//        task.setId(taskId);
-//        task.setDescription(description);
-//        task.setLatitude(latitude);
-//        task.setLongitude(longitude);
-//        task.setCompletionCriteria(completionCriteria);
-//        task.setStatus(TaskStatus.CREATED);
-//        task.setCreatedAt(createdAt != null ? createdAt : getTimestamp());
-
-        // Создаем новый набор задач с добавлением новой задачи
-        HashSet<Task> newTasks = new HashSet<>(oldState.getTasks());
-        newTasks.add(task);
-
-        // Возвращаем обновленное состояние, оставляя остальные поля без изменений
-        return new SystemState(
-                oldState.getFutureGroups(),
-                oldState.getActiveGroups(),
-                oldState.getIdleWorkers(),
-                newTasks,
-                oldState.getTimestamp()
-        );
+        return null;
     }
 }
