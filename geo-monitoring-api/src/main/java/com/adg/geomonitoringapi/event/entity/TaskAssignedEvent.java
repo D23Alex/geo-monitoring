@@ -7,6 +7,8 @@ import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,17 +20,25 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Table
 public class TaskAssignedEvent extends Event {
-    private Long taskId;
     @ManyToOne
     private Worker worker; // Работник, назначаемый на задачу
+    private String description;
+    // Работники, назначенные на задачу
+    @OneToMany
+    private Set<Worker> assignedWorkers = new HashSet<>();
+    // Простой критерий завершения (можно расширить)
+    private String completionCriteria;
+    private Instant createdAt;
+    private Instant closedAt;
+    private Long locationCreationEventId;
 
     @Override
     public SystemState updateState(SystemState oldState) {
         Set<Task> updatedTasks = oldState.getTasks().stream().peek(task -> {
-            if (task.getId().equals(taskId)) {
-                task.getAssignedWorkers().add(worker);
-                task.setStatus(TaskStatus.ASSIGNED);
-            }
+//            if (task.equals(ntask)) {
+//                task.getAssignedWorkers().add(worker);
+//                task.setStatus(TaskStatus.ASSIGNED);
+//            }
         }).collect(Collectors.toSet());
         return new SystemState(
                 oldState.getFutureGroups(),

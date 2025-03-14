@@ -28,13 +28,13 @@ public class TaskCreatedEvent extends Event {
     @Override
     public SystemState updateState(SystemState oldState) {
         Task task = new Task();
-        task.setId(taskId);
-        task.setDescription(description);
-        task.setLatitude(latitude);
-        task.setLongitude(longitude);
-        task.setCompletionCriteria(completionCriteria);
-        task.setStatus(TaskStatus.CREATED);
-        task.setCreatedAt(createdAt != null ? createdAt : getTimestamp());
+//        task.setId(taskId);
+//        task.setDescription(description);
+//        task.setLatitude(latitude);
+//        task.setLongitude(longitude);
+//        task.setCompletionCriteria(completionCriteria);
+//        task.setStatus(TaskStatus.CREATED);
+//        task.setCreatedAt(createdAt != null ? createdAt : getTimestamp());
 
         // Создаем новый набор задач с добавлением новой задачи
         HashSet<Task> newTasks = new HashSet<>(oldState.getTasks());

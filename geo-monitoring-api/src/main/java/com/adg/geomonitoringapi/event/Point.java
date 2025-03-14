@@ -10,10 +10,6 @@ import lombok.*;
 @EqualsAndHashCode
 @Embeddable
 public class Point {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
     private Double latitude;
     private Double longitude;
 }

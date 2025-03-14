@@ -13,7 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
-    private Long id;
     private String description;
     // Опциональная геолокация
     private Double latitude;

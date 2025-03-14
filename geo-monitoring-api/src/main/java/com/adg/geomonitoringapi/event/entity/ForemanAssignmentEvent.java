@@ -1,8 +1,8 @@
 package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.state.SystemState;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.adg.geomonitoringapi.worker.entity.Worker;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Set;
@@ -15,9 +15,11 @@ import java.util.Set;
 @AllArgsConstructor
 @Table
 public class ForemanAssignmentEvent extends Event {
-    private Long workerId;
+    @ManyToOne
+    private Worker worker;
     // Идентификаторы подчинённых, за которыми назначается бригадир
-    private Set<Long> subordinateWorkerIds;
+    @OneToMany
+    private Set<Worker> subordinateWorkers;
 
     @Override
     public SystemState updateState(SystemState oldState) {

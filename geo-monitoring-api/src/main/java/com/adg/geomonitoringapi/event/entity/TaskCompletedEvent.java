@@ -21,11 +21,11 @@ public class TaskCompletedEvent extends Event {
     @Override
     public SystemState updateState(SystemState oldState) {
         Set<Task> updatedTasks = oldState.getTasks().stream().peek(task -> {
-            if (task.getId().equals(taskId)) {
-                task.setStatus(TaskStatus.COMPLETED);
-                task.setClosingReason(closingReason);
-                task.setClosedAt(closedAt != null ? closedAt : getTimestamp());
-            }
+//            if (task.getId().equals(taskId)) {
+//                task.setStatus(TaskStatus.COMPLETED);
+//                task.setClosingReason(closingReason);
+//                task.setClosedAt(closedAt != null ? closedAt : getTimestamp());
+//            }
         }).collect(Collectors.toSet());
         return new SystemState(
                 oldState.getFutureGroups(),
