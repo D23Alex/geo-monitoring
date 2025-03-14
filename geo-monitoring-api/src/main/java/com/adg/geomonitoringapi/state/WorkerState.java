@@ -23,19 +23,6 @@ public final class WorkerState {
         return travelHistory.get(travelHistory.lastKey());
     }
 
-    private Double calculateDistance(NavigableMap<Instant, Point> travelHistory) {
-        double totalDistance = 0.0;
-        Point prevPoint = null;
-
-        for (Point point : travelHistory.values()) {
-            if (prevPoint != null) {
-                totalDistance += Geometry.haversine(prevPoint, point);
-            }
-            prevPoint = point;
-        }
-        return totalDistance;
-    }
-
     public Double distanceTravelled() {
         return calculateDistance(travelHistory);
     }
@@ -61,6 +48,19 @@ public final class WorkerState {
 
         return Geometry.haversine(first, last)
                 < IDLE_THRESHOLD_IN_METERS;
+    }
+
+    private Double calculateDistance(NavigableMap<Instant, Point> travelHistory) {
+        double totalDistance = 0.0;
+        Point prevPoint = null;
+
+        for (Point point : travelHistory.values()) {
+            if (prevPoint != null) {
+                totalDistance += Geometry.haversine(prevPoint, point);
+            }
+            prevPoint = point;
+        }
+        return totalDistance;
     }
 
     private Instant lastHeardFrom() {
