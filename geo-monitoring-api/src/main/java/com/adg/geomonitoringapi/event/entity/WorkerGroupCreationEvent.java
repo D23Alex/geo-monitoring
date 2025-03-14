@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table
 public class WorkerGroupCreationEvent extends Event {
     @ManyToOne
