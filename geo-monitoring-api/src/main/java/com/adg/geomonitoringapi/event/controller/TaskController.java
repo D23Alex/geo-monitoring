@@ -5,16 +5,14 @@ import com.adg.geomonitoringapi.event.entity.TaskCreatedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCompletedEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.event.SystemState;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/tasks")
 public class TaskController {
     private final EventRepository eventRepository;
-
-    public TaskController(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
 
     // Создание задачи (бригадир)
     @PostMapping

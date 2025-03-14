@@ -2,11 +2,13 @@ package com.adg.geomonitoringapi.snapshot.service;
 
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.event.SystemState;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class StateService {
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     public SystemState getCurrentState() {
         return eventRepository.findAll().stream()
