@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.group.entity;
+package com.adg.geomonitoringapi.event;
 
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.AllArgsConstructor;

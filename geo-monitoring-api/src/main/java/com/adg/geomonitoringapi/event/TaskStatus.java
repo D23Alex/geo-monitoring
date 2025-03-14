@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.task.status;
+package com.adg.geomonitoringapi.event;
 
 public enum TaskStatus {
     CREATED,
