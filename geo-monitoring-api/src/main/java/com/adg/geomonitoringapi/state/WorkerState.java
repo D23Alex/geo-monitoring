@@ -23,7 +23,7 @@ public final class WorkerState {
         return travelHistory.get(travelHistory.lastKey());
     }
 
-    public Double distanceTravelled() {
+    private Double calculateDistance(NavigableMap<Instant, Point> travelHistory) {
         double totalDistance = 0.0;
         Point prevPoint = null;
 
@@ -36,20 +36,15 @@ public final class WorkerState {
         return totalDistance;
     }
 
+    public Double distanceTravelled() {
+        return calculateDistance(travelHistory);
+    }
+
     public Double distanceTravelledBetween(Instant t1, Instant t2) {
         NavigableMap<Instant, Point> subMap = travelHistory.subMap(t1, true, t2, true);
         if (subMap.isEmpty()) return 0.0;
 
-        double distance = 0.0;
-        Point prevPoint = null;
-
-        for (Point point : subMap.values()) {
-            if (prevPoint != null) {
-                distance += Geometry.haversine(prevPoint, point);
-            }
-            prevPoint = point;
-        }
-        return distance;
+        return calculateDistance(subMap);
     }
 
     public Boolean isIdle() {
