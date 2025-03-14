@@ -1,6 +1,6 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.state.SystemState;
+import com.adg.geomonitoringapi.event.SystemState;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;

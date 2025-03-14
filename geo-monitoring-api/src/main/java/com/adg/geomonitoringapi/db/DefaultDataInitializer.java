@@ -2,7 +2,7 @@ package com.adg.geomonitoringapi.db;
 
 import com.adg.geomonitoringapi.event.entity.WorkerGroupCreationEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
-import com.adg.geomonitoringapi.state.SystemState;
+import com.adg.geomonitoringapi.event.SystemState;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import com.adg.geomonitoringapi.worker.repository.WorkerRepository;
 import jakarta.annotation.PostConstruct;

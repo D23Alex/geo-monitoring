@@ -1,7 +1,5 @@
-package com.adg.geomonitoringapi.state;
+package com.adg.geomonitoringapi.event;
 
-import com.adg.geomonitoringapi.group.entity.Group;
-import com.adg.geomonitoringapi.task.entity.Task;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

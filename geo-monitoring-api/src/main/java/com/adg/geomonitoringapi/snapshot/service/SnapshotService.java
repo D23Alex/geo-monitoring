@@ -4,7 +4,7 @@ import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.snapshot.entity.Snapshot;
 import com.adg.geomonitoringapi.snapshot.repository.SnapshotRepository;
-import com.adg.geomonitoringapi.state.SystemState;
+import com.adg.geomonitoringapi.event.SystemState;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 

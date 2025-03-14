@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.location.entity;
+package com.adg.geomonitoringapi.event;
 
 import jakarta.persistence.*;
 import lombok.*;

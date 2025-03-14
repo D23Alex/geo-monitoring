@@ -1,7 +1,7 @@
-package com.adg.geomonitoringapi.state.service;
+package com.adg.geomonitoringapi.snapshot.service;
 
 import com.adg.geomonitoringapi.event.repository.EventRepository;
-import com.adg.geomonitoringapi.state.SystemState;
+import com.adg.geomonitoringapi.event.SystemState;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,6 @@
 package com.adg.geomonitoringapi.event.entity;
 
-import com.adg.geomonitoringapi.location.entity.Point;
+import com.adg.geomonitoringapi.event.Point;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
