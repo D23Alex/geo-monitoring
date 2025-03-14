@@ -2,7 +2,7 @@ package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.event.Group;
 import com.adg.geomonitoringapi.worker.entity.Worker;
-import com.adg.geomonitoringapi.event.SystemState;
+import com.adg.geomonitoringapi.state.SystemState;
 import jakarta.persistence.*;
 import lombok.*;
 

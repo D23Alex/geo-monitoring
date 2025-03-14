@@ -1,7 +1,7 @@
 package com.adg.geomonitoringapi.event.controller;
 
 import com.adg.geomonitoringapi.snapshot.service.StateService;
-import com.adg.geomonitoringapi.event.SystemState;
+import com.adg.geomonitoringapi.state.SystemState;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

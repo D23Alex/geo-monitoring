@@ -1,6 +1,8 @@
-package com.adg.geomonitoringapi.worker.state;
+package com.adg.geomonitoringapi.state;
 
-import com.adg.geomonitoringapi.location.entity.Point;
+
+import com.adg.geomonitoringapi.event.Point;
+import com.adg.geomonitoringapi.geometry.Geometry;
 import lombok.*;
 
 import java.time.Instant;
@@ -15,8 +17,6 @@ public final class WorkerState {
     private static final long IDLE_TIMEOUT_IN_SECONDS = 600L;
     private static final long IDLE_THRESHOLD_IN_METERS = 10L;
 
-    //todo: сделать атрибутами заданные работнику
-
     TreeMap<Instant, Point> travelHistory = new TreeMap<>();
 
     public Point lastKnownPosition() {
@@ -24,11 +24,32 @@ public final class WorkerState {
     }
 
     public Double distanceTravelled() {
-        return null; //todo: не делать, сначала изменить point
+        double totalDistance = 0.0;
+        Point prevPoint = null;
+
+        for (Point point : travelHistory.values()) {
+            if (prevPoint != null) {
+                totalDistance += Geometry.haversine(prevPoint, point);
+            }
+            prevPoint = point;
+        }
+        return totalDistance;
     }
 
     public Double distanceTravelledBetween(Instant t1, Instant t2) {
-        return null;
+        NavigableMap<Instant, Point> subMap = travelHistory.subMap(t1, true, t2, true);
+        if (subMap.isEmpty()) return 0.0;
+
+        double distance = 0.0;
+        Point prevPoint = null;
+
+        for (Point point : subMap.values()) {
+            if (prevPoint != null) {
+                distance += Geometry.haversine(prevPoint, point);
+            }
+            prevPoint = point;
+        }
+        return distance;
     }
 
     public Boolean isIdle() {
@@ -43,8 +64,8 @@ public final class WorkerState {
         Point first = recentPoints.firstEntry().getValue();
         Point last = recentPoints.lastEntry().getValue();
 
-        // todo: вызови функцию из геометрии
-        return false;
+        return Geometry.haversine(first, last)
+                < IDLE_THRESHOLD_IN_METERS;
     }
 
     private Instant lastHeardFrom() {
