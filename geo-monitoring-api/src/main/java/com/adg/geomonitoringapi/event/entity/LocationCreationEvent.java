@@ -1,5 +1,6 @@
-package com.adg.geomonitoringapi.location.entity;
+package com.adg.geomonitoringapi.event.entity;
 
+import com.adg.geomonitoringapi.location.entity.Point;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,19 +9,14 @@ import lombok.Setter;
 
 import java.util.Set;
 
-@Entity
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table
-public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class LocationCreationEvent {
     private String name;
 
-    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ElementCollection
+    @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
     private Set<Point> points;
 }

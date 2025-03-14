@@ -1,13 +1,19 @@
 package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.state.SystemState;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
 
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table
 public class ForemanAssignmentEvent extends Event {
     private Long workerId;
     // Идентификаторы подчинённых, за которыми назначается бригадир

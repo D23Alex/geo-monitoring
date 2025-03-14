@@ -14,5 +14,5 @@ import java.util.Set;
 @AllArgsConstructor
 public final class Group {
     private Set<Worker> workers;
-    private Worker brigadier;
+    private Worker foreman;
 }

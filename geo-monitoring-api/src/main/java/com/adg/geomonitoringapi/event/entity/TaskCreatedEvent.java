@@ -3,14 +3,20 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.task.entity.Task;
 import com.adg.geomonitoringapi.task.status.TaskStatus;
 import com.adg.geomonitoringapi.state.SystemState;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table
 public class TaskCreatedEvent extends Event {
     private Long taskId;
     private String description;

@@ -1,17 +1,14 @@
 package com.adg.geomonitoringapi.location.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Entity
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table
+@EqualsAndHashCode
+@Embeddable
 public class Point {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +16,4 @@ public class Point {
 
     private int width;
     private int length;
-
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
-
 }

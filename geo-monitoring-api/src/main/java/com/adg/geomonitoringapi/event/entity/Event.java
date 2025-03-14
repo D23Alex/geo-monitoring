@@ -27,6 +27,7 @@ import java.time.Instant;
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.ForemanAssignmentEvent.class, name = "ForemanAssignmentEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent.class, name = "WorkerPositionUpdateEvent")
 })
+@Table
 public abstract class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
