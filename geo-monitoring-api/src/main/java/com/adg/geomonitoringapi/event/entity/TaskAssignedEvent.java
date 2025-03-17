@@ -23,7 +23,7 @@ public class TaskAssignedEvent extends Event {
     @OneToMany
     private Set<Worker> assignedWorkers;
     // Простой критерий завершения (можно расширить) TODO: реализовать критерии
-    private String completionCriteria;
+//    private String completionCriteria;
     private Long locationId;
     private Instant activeFrom;
     private Instant activeTo;
@@ -36,7 +36,7 @@ public class TaskAssignedEvent extends Event {
 
         TaskState newTask = TaskState.builder()
                 .assignedWorkers(assignedWorkers)
-                .completionCriteria(completionCriteria)
+//                .completionCriteria(completionCriteria)
                 .createdAt(getTimestamp())
                 .description(description)
                 .status(TaskStatus.CREATED)
