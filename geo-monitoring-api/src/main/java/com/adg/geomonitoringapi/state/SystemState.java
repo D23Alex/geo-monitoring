@@ -23,6 +23,6 @@ public final class SystemState {
     private Instant timestamp;
 
     public static SystemState initial() {
-        return new SystemState(Set.of(), Set.of(), Set.of(), Set.of(), Instant.now());
+        return new SystemState();
     }
 }
