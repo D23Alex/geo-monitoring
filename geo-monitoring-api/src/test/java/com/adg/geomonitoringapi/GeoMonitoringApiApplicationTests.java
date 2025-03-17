@@ -53,7 +53,7 @@ class GeoMonitoringApiApplicationTests {
         locationEvent.setName("Склад");
         locationEvent.setPoints(Set.of(new Point(10.0, 20.0), new Point(10.1, 20.1)));
         locationEvent.setTimestamp(Instant.now().minusSeconds(100));
-        state = locationEvent.updateState(state);
+        state = locationEvent.apply(state);
 
         // Проверяем, что локация добавлена
         Assertions.assertThat(state.getLocations()).containsKey(1L);
@@ -62,11 +62,9 @@ class GeoMonitoringApiApplicationTests {
 
         // 2. Событие создания группы рабочих
         Worker foreman = new Worker();
-        foreman.setId(100L);
         foreman.setName("Алиса");
 
         Worker worker = new Worker();
-        worker.setId(101L);
         worker.setName("Боб");
 
         WorkerGroupCreationEvent groupEvent = new WorkerGroupCreationEvent();
@@ -76,7 +74,7 @@ class GeoMonitoringApiApplicationTests {
         groupEvent.setGroupActiveFrom(Instant.now().minusSeconds(90));
         groupEvent.setGroupActiveTo(Instant.now().plusSeconds(90));
         groupEvent.setTimestamp(Instant.now().minusSeconds(90));
-        state = groupEvent.updateState(state);
+        state = groupEvent.apply(state);
 
         // Проверяем, что группа добавлена
         Assertions.assertThat(state.getGroups()).containsKey(2L);
@@ -88,12 +86,11 @@ class GeoMonitoringApiApplicationTests {
         taskAssignedEvent.setId(3L); // id задачи
         taskAssignedEvent.setLocationId(1L); // ссылка на существующую локацию
         taskAssignedEvent.setDescription("Проверка инвентаря");
-        taskAssignedEvent.setCompletionCriteria("Проверены все позиции");
         taskAssignedEvent.setActiveFrom(Instant.now().minusSeconds(80));
         taskAssignedEvent.setActiveTo(Instant.now().plusSeconds(80));
         taskAssignedEvent.setAssignedWorkers(Collections.emptySet());
         taskAssignedEvent.setTimestamp(Instant.now().minusSeconds(80));
-        state = taskAssignedEvent.updateState(state);
+        state = taskAssignedEvent.apply(state);
 
         // Проверяем, что задача добавлена
         Assertions.assertThat(state.getTasks()).containsKey(3L);
@@ -108,7 +105,7 @@ class GeoMonitoringApiApplicationTests {
         Instant closedAt = Instant.now();
         taskCompletedEvent.setClosedAt(closedAt);
         taskCompletedEvent.setTimestamp(Instant.now().minusSeconds(70));
-        state = taskCompletedEvent.updateState(state);
+        state = taskCompletedEvent.apply(state);
 
         // Проверяем, что статус задачи изменился на COMPLETED и установлено время закрытия
         taskState = state.getTasks().get(3L);

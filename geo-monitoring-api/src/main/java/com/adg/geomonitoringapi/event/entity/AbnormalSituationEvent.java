@@ -16,12 +16,11 @@ import lombok.*;
 @AllArgsConstructor
 @Table
 public class AbnormalSituationEvent extends Event {
-    @ManyToOne
     private Worker worker;
     private String description; // описание внештатной ситуации
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         // В данной простой реализации состояние не изменяется,
         // но в полном варианте можно добавить список событий с внештатными ситуациями в state.
         return oldState;

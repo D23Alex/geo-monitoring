@@ -1,7 +1,6 @@
 package com.adg.geomonitoringapi.event.controller;
 
 import com.adg.geomonitoringapi.event.entity.TaskAssignedEvent;
-import com.adg.geomonitoringapi.event.entity.TaskCreatedEvent;
 import com.adg.geomonitoringapi.event.entity.TaskCompletedEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.state.SystemState;
@@ -16,7 +15,7 @@ public class TaskController {
 
     // Создание задачи (бригадир)
     @PostMapping
-    public String createTask(@RequestBody TaskCreatedEvent event) {
+    public String createTask(@RequestBody TaskAssignedEvent event) {
         eventRepository.save(event);
         return "Task created event saved";
     }
@@ -40,7 +39,7 @@ public class TaskController {
     public SystemState getTasksState() {
         return eventRepository.findAll().stream()
                 .reduce(SystemState.initial(),
-                        (state, event) -> event.updateState(state),
+                        (state, event) -> event.apply(state),
                         (s1, s2) -> s2);
     }
 }

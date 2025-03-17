@@ -49,7 +49,7 @@ public class SnapshotService {
                 .toList();
 
         for (Event event : newEvents) {
-            state = event.updateState(state);
+            state = event.apply(state);
         }
         return state;
     }

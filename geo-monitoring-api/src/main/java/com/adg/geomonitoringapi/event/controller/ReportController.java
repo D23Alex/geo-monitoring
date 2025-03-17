@@ -27,7 +27,7 @@ public class ReportController {
     ) {
         SystemState state = eventRepository.findAll().stream()
                 .reduce(SystemState.initial(),
-                        (s, e) -> e.updateState(s),
+                        (s, e) -> e.apply(s),
                         (s1, s2) -> s2);
 
         long totalTasks = state.getTasks().values().stream()
@@ -49,7 +49,7 @@ public class ReportController {
     public Map<String, Object> getProgressReport() {
         SystemState state = eventRepository.findAll().stream()
                 .reduce(SystemState.initial(),
-                        (s, e) -> e.updateState(s),
+                        (s, e) -> e.apply(s),
                         (s1, s2) -> s2);
 
         Map<String, Long> statusCount = state.getTasks().values().stream()

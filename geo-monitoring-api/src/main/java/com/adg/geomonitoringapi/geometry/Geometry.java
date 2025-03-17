@@ -2,6 +2,8 @@ package com.adg.geomonitoringapi.geometry;
 
 import com.adg.geomonitoringapi.event.Point;
 
+import java.util.Collection;
+
 public class Geometry {
     private static final double R = 6371.0; // Радиус Земли в километрах
 
@@ -23,5 +25,18 @@ public class Geometry {
 
     public static Double haversine(Point p1, Point p2) {
         return haversine(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
+    }
+
+    public static Double totalTravelDistance(Collection<Point> travelHistory) {
+        double totalDistance = 0.0;
+        Point prevPoint = null;
+
+        for (Point point : travelHistory) {
+            if (prevPoint != null) {
+                totalDistance += Geometry.haversine(prevPoint, point);
+            }
+            prevPoint = point;
+        }
+        return totalDistance;
     }
 }

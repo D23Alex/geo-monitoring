@@ -28,7 +28,7 @@ public class LocationCreationEvent extends Event {
     private Set<Point> points;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         LocationState newLocation = LocationState.builder()
                 .points(points)
                 .name(name)

@@ -20,12 +20,4 @@ import java.net.URI;
 public class WorkerController {
     private final WorkerService workerService;
     private final WorkerMapper workerMapper;
-
-    @PostMapping
-    public ResponseEntity<WorkerResponseDTO> createWorker(@RequestBody WorkerCreationDTO workerCreationDTO) {
-        Worker worker = workerMapper.toEntityFromCreationDTO(workerCreationDTO);
-        Worker createdWorker = workerService.createWorker(worker);
-        WorkerResponseDTO workerResponseDTO = workerMapper.toResponseDTO(createdWorker);
-        return ResponseEntity.created(URI.create("/api/workers/" + worker.getId())).body(workerResponseDTO);
-    }
 }

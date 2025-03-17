@@ -19,7 +19,7 @@ public class LocationDeleteEvent extends Event {
     private Long locationId;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         var newLocations = new HashMap<>(oldState.getLocations());
         LocationState removedLocation = newLocations.remove(locationId);
 

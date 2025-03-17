@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
@@ -19,20 +20,27 @@ import java.time.Instant;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerGroupCreationEvent.class, name = "WorkerGroupCreationEvent"),
-        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCreatedEvent.class, name = "TaskCreatedEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskAssignedEvent.class, name = "TaskAssignedEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCompletedEvent.class, name = "TaskCompletedEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCancelledEvent.class, name = "TaskCancelledEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.AbnormalSituationEvent.class, name = "AbnormalSituationEvent"),
-        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.ForemanAssignmentEvent.class, name = "ForemanAssignmentEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent.class, name = "WorkerPositionUpdateEvent")
 })
 @Table
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant timestamp;
 
-    public abstract SystemState updateState(SystemState oldState);
+    // Метод, который действительно поочередно вызывается на последовательности ивентов для получения стейта
+    public SystemState updateState(SystemState oldState) {
+        return apply(oldState).withLastEvent(this);
+    }
+
+    // Метод, который нужно переопределять
+    public abstract SystemState apply(SystemState oldState);
 }
