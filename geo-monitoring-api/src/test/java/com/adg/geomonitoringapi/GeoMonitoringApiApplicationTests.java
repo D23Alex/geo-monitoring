@@ -88,7 +88,7 @@ class GeoMonitoringApiApplicationTests {
         taskAssignedEvent.setId(3L); // id задачи
         taskAssignedEvent.setLocationId(1L); // ссылка на существующую локацию
         taskAssignedEvent.setDescription("Проверка инвентаря");
-        taskAssignedEvent.setCompletionCriteria("Проверены все позиции");
+//        taskAssignedEvent.setCompletionCriteria("Проверены все позиции");
         taskAssignedEvent.setActiveFrom(Instant.now().minusSeconds(80));
         taskAssignedEvent.setActiveTo(Instant.now().plusSeconds(80));
         taskAssignedEvent.setAssignedWorkers(Collections.emptySet());
