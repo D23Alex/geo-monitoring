@@ -16,8 +16,8 @@ import java.time.Instant;
 @Table
 public class WorkerPositionUpdateEvent extends Event {
     private Long workerId;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private Instant updateTime;
 
     @Override

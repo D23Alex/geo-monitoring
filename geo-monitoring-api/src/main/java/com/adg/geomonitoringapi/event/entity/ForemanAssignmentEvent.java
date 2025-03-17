@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-public class ForemanAssignmentEvent extends Event {
+public class ForemanAssignmentEvent extends Event { //TODO: дублирует WorkerGroupCreationEvent, удалить
     @ManyToOne
     private Worker worker;
     // Идентификаторы подчинённых, за которыми назначается бригадир

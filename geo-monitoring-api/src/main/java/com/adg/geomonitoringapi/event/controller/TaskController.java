@@ -24,7 +24,7 @@ public class TaskController {
     // Назначение задачи работнику
     @PostMapping("/{taskId}/assign")
     public String assignTask(@PathVariable Long taskId, @RequestBody TaskAssignedEvent event) {
-        return null;
+      return null;
     }
 
     // Закрытие задачи (например, выполнена или отозвана)

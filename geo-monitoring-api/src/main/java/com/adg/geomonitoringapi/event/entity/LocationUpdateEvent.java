@@ -20,8 +20,8 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LocationCreationEvent extends Event {
-    private String name;
+public class LocationUpdateEvent extends Event {
+    private Long locationId;
 
     @ElementCollection
     @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
@@ -29,19 +29,15 @@ public class LocationCreationEvent extends Event {
 
     @Override
     public SystemState updateState(SystemState oldState) {
-        LocationState newLocation = LocationState.builder()
-                .points(points)
-                .name(name)
-                .build();
+        LocationState oldLocation = oldState.getLocations().get(locationId);
+        LocationState updatedLoaction = oldLocation.withPoints(points);
 
-        Long newLocationId = getId();
-
-        if (oldState.getLocations().containsKey(newLocationId))
-            throw new SystemState.StateUpdateException("Невозможно создать локацию: локация с id "
-                    + newLocationId + " уже существует");
+        if (updatedLoaction == null)
+            throw new SystemState.StateUpdateException("Невозможно обновить локацию: локация с id "
+                    + locationId + " не существует");
 
         var newLocations = new HashMap<>(oldState.getLocations());
-        newLocations.put(newLocationId, newLocation);
+        newLocations.put(locationId, updatedLoaction);
 
         return oldState.withLocations(newLocations);
     }

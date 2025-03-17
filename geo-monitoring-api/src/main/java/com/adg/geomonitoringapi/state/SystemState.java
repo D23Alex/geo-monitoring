@@ -1,28 +1,36 @@
 package com.adg.geomonitoringapi.state;
 
-import com.adg.geomonitoringapi.event.Group;
-import com.adg.geomonitoringapi.event.Task;
 import com.adg.geomonitoringapi.worker.entity.Worker;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@With
 public final class SystemState {
-    private Set<Group> futureGroups;
-    private Set<Group> activeGroups;
-    private Set<Worker> idleWorkers;
-    private Set<Task> tasks;
+
+    public static class StateUpdateException extends RuntimeException {
+        public StateUpdateException(String s) {
+        }
+    }
+
+    private Map<Long, GroupState> groups;
+    private Map<Long, LocationState> locations;
+    private Map<Long, TaskState> tasks;
     private Instant timestamp;
 
-    public static SystemState initial() {
-        return new SystemState();
+    public static Set<Worker> idleWorkers() {
+        return null; //TODO: implement
     }
+
+    public static SystemState initial() {
+      return new SystemState(Map.of(), Map.of(), Map.of(), Instant.now()
+    }
+
+
 }
