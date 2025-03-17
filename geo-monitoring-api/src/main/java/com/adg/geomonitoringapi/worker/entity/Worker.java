@@ -11,7 +11,9 @@ import lombok.*;
 @Builder
 public class Worker {
     @Id
+    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "name")
     private String name;
 }
