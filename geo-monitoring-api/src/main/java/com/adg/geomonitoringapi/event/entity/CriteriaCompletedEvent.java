@@ -21,15 +21,13 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class CriteriaCompletedEvent extends Event {
     private Long taskId;
-    private Long criteriaNumber;
+    private Integer criteriaNumber;
     private Instant completedAt;
     private String completionComment;
-    private Long photoProofId;
-    @ManyToOne
     private Worker completedBy;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         if (!oldState.getTasks().containsKey(taskId))
             throw new SystemState.StateUpdateException("Невозможно выполнить критерий: задача с id "
                     + taskId + " не существует");
@@ -43,9 +41,9 @@ public class CriteriaCompletedEvent extends Event {
         if (old.isCompleted())
             throw new SystemState.StateUpdateException("Невозможно выполнить критерий: уже выполнено");
 
-        CompletionCriteriaState newCompletionCriteria = old.withCompleted(true)
-                .withComment(completionComment)
-                .withPhotoProofId(photoProofId);
+        CompletionCriteriaState newCompletionCriteria = old
+                .withCompleted(true)
+                .withComment(completionComment);
 
         var newCriteria = new HashMap<>(oldState.getTasks().get(taskId).getCompletionCriteria());
         newCriteria.put(criteriaNumber, newCompletionCriteria);

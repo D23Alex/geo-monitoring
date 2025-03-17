@@ -19,16 +19,15 @@ import java.util.Set;
 @Builder
 @Table
 public class WorkerGroupCreationEvent extends Event {
-    @ManyToOne
     private Worker foreman;
-    @OneToMany
+    @ElementCollection
     private Set<Worker> workers;
     Instant groupActiveFrom;
     Instant groupActiveTo;
     Instant timestamp;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         GroupState newGroup = GroupState.builder()
                 .workers(workers)
                 .foreman(foreman)

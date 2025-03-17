@@ -1,5 +1,7 @@
 package com.adg.geomonitoringapi.state;
 
+import com.adg.geomonitoringapi.event.entity.Event;
+import com.adg.geomonitoringapi.event.entity.NothingHappenedEvent;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.*;
 
@@ -22,14 +24,20 @@ public final class SystemState {
     private Map<Long, GroupState> groups;
     private Map<Long, LocationState> locations;
     private Map<Long, TaskState> tasks;
-    private Instant timestamp;
+    private Map<Long, WorkerState> workers;
+    private Event lastEvent;
 
     public static Set<Worker> idleWorkers() {
         return null; //TODO: implement
     }
 
     public static SystemState initial() {
-        return new SystemState(Map.of(), Map.of(), Map.of(), Instant.now());
+        return new SystemState(Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                NothingHappenedEvent.builder().id(0L).timestamp(Instant.EPOCH).build()
+        );
     }
 
 

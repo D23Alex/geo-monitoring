@@ -1,6 +1,8 @@
 package com.adg.geomonitoringapi.event.entity;
 
+import com.adg.geomonitoringapi.event.CompletionCriteria;
 import com.adg.geomonitoringapi.event.TaskStatus;
+import com.adg.geomonitoringapi.state.CompletionCriteriaState;
 import com.adg.geomonitoringapi.state.TaskState;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
@@ -8,8 +10,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -19,24 +23,36 @@ import java.util.Set;
 @AllArgsConstructor
 public class TaskAssignedEvent extends Event {
     private String description;
-    // Работники, назначенные на задачу
-    @OneToMany
+    @ElementCollection
     private Set<Worker> assignedWorkers;
-    // Простой критерий завершения (можно расширить) TODO: реализовать критерии
-//    private String completionCriteria;
+    @ElementCollection
+    private List<CompletionCriteria> completionCriteria;
     private Long locationId;
     private Instant activeFrom;
     private Instant activeTo;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         if (!oldState.getLocations().containsKey(locationId))
             throw new SystemState.StateUpdateException("Невозможно создать задачу: локация с id "
                     + locationId + " не существует");
 
+        Map<Integer, CompletionCriteriaState> completionCriteriaStates = new HashMap<>();
+        for (int i = 0; i < completionCriteria.size(); i++) {
+            CompletionCriteria cur = completionCriteria.get(i);
+            completionCriteriaStates.put(i,
+                    CompletionCriteriaState.builder()
+                            .isCompleted(false)
+                            .name(cur.getName())
+                            .description(cur.getDescription())
+                            .isCommentRequired(cur.isCommentRequired())
+                            .isPhotoProofRequired(cur.isPhotoProofRequired()).build()
+            );
+        }
+
         TaskState newTask = TaskState.builder()
                 .assignedWorkers(assignedWorkers)
-//                .completionCriteria(completionCriteria)
+                .completionCriteria(completionCriteriaStates)
                 .createdAt(getTimestamp())
                 .description(description)
                 .status(TaskStatus.CREATED)

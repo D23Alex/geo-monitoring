@@ -23,7 +23,7 @@ public class TaskCancelledEvent extends Event {
     private Instant closedAt;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         if (!oldState.getTasks().containsKey(taskId))
             throw new SystemState.StateUpdateException("Невозможно отменить задачу: задача с id "
                     + taskId + " не существует");

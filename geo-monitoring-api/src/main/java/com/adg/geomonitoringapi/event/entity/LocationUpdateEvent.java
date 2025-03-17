@@ -28,16 +28,16 @@ public class LocationUpdateEvent extends Event {
     private Set<Point> points;
 
     @Override
-    public SystemState updateState(SystemState oldState) {
+    public SystemState apply(SystemState oldState) {
         LocationState oldLocation = oldState.getLocations().get(locationId);
-        LocationState updatedLoaction = oldLocation.withPoints(points);
+        LocationState updatedLocation = oldLocation.withPoints(points);
 
-        if (updatedLoaction == null)
+        if (updatedLocation == null)
             throw new SystemState.StateUpdateException("Невозможно обновить локацию: локация с id "
                     + locationId + " не существует");
 
         var newLocations = new HashMap<>(oldState.getLocations());
-        newLocations.put(locationId, updatedLoaction);
+        newLocations.put(locationId, updatedLocation);
 
         return oldState.withLocations(newLocations);
     }

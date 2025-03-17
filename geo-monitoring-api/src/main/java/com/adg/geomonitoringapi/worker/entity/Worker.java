@@ -3,7 +3,7 @@ package com.adg.geomonitoringapi.worker.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+@Embeddable
 @Getter
 @Setter
 @NoArgsConstructor

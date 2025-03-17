@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class WorkerService {
-    private final WorkerRepository workerRepository;
+private final WorkerRepository workerRepository;
 
     @Transactional
     public Worker createWorker(Worker worker) {

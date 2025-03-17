@@ -19,7 +19,7 @@ public class TaskState {
     // Работники, назначенные на задачу
     private Set<Worker> assignedWorkers = new HashSet<>();
     private TaskStatus status;
-    private Map<Long, CompletionCriteriaState> completionCriteria;
+    private Map<Integer, CompletionCriteriaState> completionCriteria;
     private Instant createdAt;
     private Instant closedAt;
     private String closingReason;

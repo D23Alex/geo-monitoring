@@ -13,10 +13,13 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@With
 public final class WorkerState {
     private static final long IDLE_TIMEOUT_IN_SECONDS = 600L;
     private static final long IDLE_THRESHOLD_IN_METERS = 10L;
 
+    private String name;
+    @Builder.Default
     TreeMap<Instant, Point> travelHistory = new TreeMap<>();
 
     public Point lastKnownPosition() {
@@ -24,14 +27,15 @@ public final class WorkerState {
     }
 
     public Double distanceTravelled() {
-        return calculateDistance(travelHistory);
+        return Geometry.totalTravelDistance(travelHistory.values());
     }
 
     public Double distanceTravelledBetween(Instant t1, Instant t2) {
         NavigableMap<Instant, Point> subMap = travelHistory.subMap(t1, true, t2, true);
-        if (subMap.isEmpty()) return 0.0;
+        if (subMap.isEmpty())
+            return 0.0;
 
-        return calculateDistance(subMap);
+        return Geometry.totalTravelDistance(subMap.values());
     }
 
     public Boolean isIdle() {
