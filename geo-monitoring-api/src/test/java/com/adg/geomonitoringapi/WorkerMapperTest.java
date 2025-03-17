@@ -77,4 +77,7 @@ public class WorkerMapperTest {
         Assertions.assertThat(worker.getId()).isEqualTo(3L);
         Assertions.assertThat(worker.getName()).isEqualTo("Bob Johnson");
     }
+
+    @Test
+    public void testWorkerGroupCreationMapper_toDto() {}
 }
