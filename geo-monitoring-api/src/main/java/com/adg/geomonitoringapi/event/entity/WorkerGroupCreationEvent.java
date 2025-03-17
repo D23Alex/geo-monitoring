@@ -25,6 +25,7 @@ public class WorkerGroupCreationEvent extends Event {
     private Set<Worker> workers;
     Instant groupActiveFrom;
     Instant groupActiveTo;
+    Instant timestamp;
 
     @Override
     public SystemState updateState(SystemState oldState) {

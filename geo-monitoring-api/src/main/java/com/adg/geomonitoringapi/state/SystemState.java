@@ -29,7 +29,7 @@ public final class SystemState {
     }
 
     public static SystemState initial() {
-        return new SystemState(Map.of(), Map.of(), Map.of(), Instant.now());
+      return new SystemState(Map.of(), Map.of(), Map.of(), Instant.now()
     }
 
 

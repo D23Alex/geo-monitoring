@@ -1,19 +1,18 @@
 package com.adg.geomonitoringapi.event.controller;
 
-import com.adg.geomonitoringapi.event.entity.Event;
-import com.adg.geomonitoringapi.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/events")
 public class EventController {
-    private final EventRepository eventRepository;
-
-    @PostMapping
-    public String submitEvent(@RequestBody Event event) {
-        eventRepository.save(event);
-        return "Event saved";
-    }
+//    private final EventRepository eventRepository;
+//
+//    @PostMapping
+//    public String submitEvent(@RequestBody Event event) {
+//        eventRepository.save(event);
+//        return "Event saved";
+//    }
 }
