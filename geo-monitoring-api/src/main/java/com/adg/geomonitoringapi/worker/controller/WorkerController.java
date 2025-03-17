@@ -3,9 +3,9 @@ package com.adg.geomonitoringapi.worker.controller;
 import com.adg.geomonitoringapi.worker.dto.WorkerCreationDTO;
 import com.adg.geomonitoringapi.worker.dto.WorkerResponseDTO;
 import com.adg.geomonitoringapi.worker.entity.Worker;
-import com.adg.geomonitoringapi.worker.mapper.WorkerMapper;
 import com.adg.geomonitoringapi.worker.service.WorkerService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,5 +19,13 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class WorkerController {
     private final WorkerService workerService;
-    private final WorkerMapper workerMapper;
+    private final ModelMapper mapper = new ModelMapper();
+
+    @PostMapping
+    public ResponseEntity<WorkerResponseDTO> createWorker(@RequestBody WorkerCreationDTO workerCreationDTO) {
+        Worker worker = mapper.map(workerCreationDTO, Worker.class);
+        Worker createdWorker = workerService.createWorker(worker);
+        WorkerResponseDTO workerResponseDTO = mapper.map(createdWorker, WorkerResponseDTO.class);
+        return ResponseEntity.created(URI.create("/api/workers/" + worker.getId())).body(workerResponseDTO);
+    }
 }
