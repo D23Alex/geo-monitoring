@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -18,8 +19,7 @@ public class TaskState {
     // Работники, назначенные на задачу
     private Set<Worker> assignedWorkers = new HashSet<>();
     private TaskStatus status;
-    // Простой критерий завершения (можно расширить)
-    private String completionCriteria;
+    private Map<Long, CompletionCriteriaState> completionCriteria;
     private Instant createdAt;
     private Instant closedAt;
     private String closingReason;
