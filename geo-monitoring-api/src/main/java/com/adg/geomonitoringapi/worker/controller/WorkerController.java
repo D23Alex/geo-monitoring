@@ -1,6 +1,7 @@
 package com.adg.geomonitoringapi.worker.controller;
 
 import com.adg.geomonitoringapi.worker.dto.WorkerCreationDTO;
+import com.adg.geomonitoringapi.worker.dto.WorkerResponseDTO;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import com.adg.geomonitoringapi.worker.mapper.WorkerMapper;
 import com.adg.geomonitoringapi.worker.service.WorkerService;
@@ -21,9 +22,10 @@ public class WorkerController {
     private final WorkerMapper workerMapper;
 
     @PostMapping
-    public ResponseEntity<WorkerCreationDTO> createWorker(@RequestBody WorkerCreationDTO workerCreationDTO) {
+    public ResponseEntity<WorkerResponseDTO> createWorker(@RequestBody WorkerCreationDTO workerCreationDTO) {
         Worker worker = workerMapper.toEntityFromCreationDTO(workerCreationDTO);
-        workerService.createWorker(worker);
-        return ResponseEntity.created(URI.create("/api/workers/" + worker.getId())).body(workerCreationDTO);
+        Worker createdWorker = workerService.createWorker(worker);
+        WorkerResponseDTO workerResponseDTO = workerMapper.toResponseDTO(createdWorker);
+        return ResponseEntity.created(URI.create("/api/workers/" + worker.getId())).body(workerResponseDTO);
     }
 }
