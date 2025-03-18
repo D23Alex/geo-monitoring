@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +31,7 @@ import com.example.mobile_app.ui.DrawerContent
 import com.example.mobile_app.worker.LocationService
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -74,54 +76,70 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp(startDestination: String) {
     val navController = rememberNavController()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            // Отображаем пункты меню только если пользователь авторизован
-            DrawerContent(
-                onDestinationClicked = { route ->
-                    scope.launch { drawerState.close() }
-                    // Переход к выбранному экрану
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                onExitClicked = {
-                    // Сбрасываем флаг авторизации и переходим на экран входа
-                    val prefs: SharedPreferences =
-                        context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
-                    prefs.edit() { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
-                    scope.launch { drawerState.close() }
-                    navController.navigate("login") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
-                }
-            )
-        }
+    // Получаем текущий маршрут
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    // Список маршрутов, относящихся к авторизации
+    val authRoutes = listOf("login", "registration")
+    // Если текущего маршрута ещё нет или он относится к авторизации,
+    // отображаем простой Scaffold (без Drawer и TopAppBar)
+    if (currentBackStackEntry?.destination?.route == null ||
+        currentBackStackEntry!!.destination.route in authRoutes
     ) {
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text("Mobile App") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Меню")
-                        }
-                    }
-                )
-            }
-        ) { innerPadding ->
+        Scaffold { innerPadding ->
             AppNavHost(
                 navController = navController,
                 startDestination = startDestination,
                 modifier = Modifier.padding(innerPadding)
             )
+        }
+    } else {
+        // Если пользователь уже авторизован – показываем основной интерфейс с боковым меню
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent(
+                    onDestinationClicked = { route ->
+                        scope.launch { drawerState.close() }
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onExitClicked = {
+                        // Сброс авторизации и переход на экран входа
+                        val prefs: SharedPreferences =
+                            context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+                        prefs.edit { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
+                        scope.launch { drawerState.close() }
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    }
+                )
+            }
+        ) {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = { Text("Mobile App") },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Меню")
+                            }
+                        }
+                    )
+                }
+            ) { innerPadding ->
+                AppNavHost(
+                    navController = navController,
+                    startDestination = startDestination,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
         }
     }
 }
