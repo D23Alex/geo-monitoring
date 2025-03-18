@@ -7,6 +7,7 @@ import com.adg.geomonitoringapi.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,12 +42,15 @@ public class EventController {
         eventDtoMapping.put(TaskCompletedEvent.class, TaskCompletedEventResponseDTO.class);
         eventDtoMapping.put(WorkerPositionUpdateEvent.class, WorkerPositionUpdateEventResponseDTO.class);
     }
-
+    @PostMapping
     public ResponseEntity<EventResponseDTO> createEvent(@RequestBody EventCreationDTO eventCreationDTO) {
         Event event = mapToEntity(eventCreationDTO);
         Event createdEvent = eventService.submitEvent(event);
+        if (createdEvent.getId() == null) {
+            throw new RuntimeException("Event ID is null after saving!"); // Логируйте ошибку, если ID не устанавливается
+        }
         EventResponseDTO eventResponseDTO = mapToDto(createdEvent);
-        return ResponseEntity.created(URI.create("/api/events/" + event.getId())).body(eventResponseDTO);
+        return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
     }
 
     private Event mapToEntity(EventCreationDTO eventCreationDTO) {
