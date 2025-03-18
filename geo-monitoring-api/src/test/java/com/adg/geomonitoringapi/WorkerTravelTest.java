@@ -6,7 +6,7 @@ import com.adg.geomonitoringapi.event.entity.WorkerCreationEvent;
 import com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.geometry.Geometry;
-import com.adg.geomonitoringapi.snapshot.service.StateService;
+import com.adg.geomonitoringapi.state.service.StateService;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.worker.entity.Worker;
 import org.junit.jupiter.api.BeforeEach;

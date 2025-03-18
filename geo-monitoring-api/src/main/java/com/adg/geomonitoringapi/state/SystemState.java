@@ -1,5 +1,6 @@
 package com.adg.geomonitoringapi.state;
 
+import com.adg.geomonitoringapi.event.AbsenceReason;
 import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.event.entity.NothingHappenedEvent;
 import com.adg.geomonitoringapi.worker.entity.Worker;
@@ -25,6 +26,7 @@ public final class SystemState {
     private Map<Long, LocationState> locations;
     private Map<Long, TaskState> tasks;
     private Map<Long, WorkerState> workers;
+    private Map<Long, WorkAbsenceState> absences;
     private Event lastEvent;
 
     public static Set<Worker> idleWorkers() {
@@ -33,6 +35,7 @@ public final class SystemState {
 
     public static SystemState initial() {
         return new SystemState(Map.of(),
+                Map.of(),
                 Map.of(),
                 Map.of(),
                 Map.of(),
