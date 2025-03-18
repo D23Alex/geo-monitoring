@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.worker.entity;
+package com.adg.geomonitoringapi.event;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +10,5 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Worker {
-    @Column(name = "name")
     private String name;
 }

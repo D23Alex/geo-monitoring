@@ -8,7 +8,7 @@ import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.geometry.Geometry;
 import com.adg.geomonitoringapi.state.service.StateService;
 import com.adg.geomonitoringapi.state.SystemState;
-import com.adg.geomonitoringapi.worker.entity.Worker;
+import com.adg.geomonitoringapi.event.Worker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

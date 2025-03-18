@@ -1,6 +1,6 @@
 package com.adg.geomonitoringapi.event.dto;
 
-import com.adg.geomonitoringapi.worker.dto.WorkerResponseDTO;
+import com.adg.geomonitoringapi.event.WorkerResponseDTO;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;

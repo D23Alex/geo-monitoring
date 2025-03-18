@@ -1,9 +1,8 @@
 package com.adg.geomonitoringapi.state;
 
-import com.adg.geomonitoringapi.event.AbsenceReason;
+import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.event.entity.NothingHappenedEvent;
-import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.*;
 
 import java.time.Instant;

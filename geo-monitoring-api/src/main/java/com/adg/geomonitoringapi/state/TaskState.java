@@ -1,7 +1,7 @@
 package com.adg.geomonitoringapi.state;
 
 import com.adg.geomonitoringapi.event.TaskStatus;
-import com.adg.geomonitoringapi.worker.entity.Worker;
+import com.adg.geomonitoringapi.event.Worker;
 import lombok.*;
 
 import java.time.Instant;

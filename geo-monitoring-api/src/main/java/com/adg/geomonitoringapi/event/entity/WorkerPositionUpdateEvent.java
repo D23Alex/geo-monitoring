@@ -3,14 +3,10 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.event.Point;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.WorkerState;
-import com.adg.geomonitoringapi.worker.entity.Worker;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.TreeMap;
 

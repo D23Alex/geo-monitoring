@@ -2,15 +2,23 @@ package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.event.CompletionCriteria;
 import com.adg.geomonitoringapi.event.TaskStatus;
+import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.state.CompletionCriteriaState;
-import com.adg.geomonitoringapi.state.TaskState;
-import com.adg.geomonitoringapi.worker.entity.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
-import jakarta.persistence.*;
-import lombok.*;
+import com.adg.geomonitoringapi.state.TaskState;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity

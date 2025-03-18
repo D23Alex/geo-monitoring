@@ -7,7 +7,7 @@ import com.adg.geomonitoringapi.state.GroupState;
 import com.adg.geomonitoringapi.state.LocationState;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.TaskState;
-import com.adg.geomonitoringapi.worker.entity.Worker;
+import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

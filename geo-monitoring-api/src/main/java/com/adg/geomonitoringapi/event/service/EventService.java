@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi.service;
+package com.adg.geomonitoringapi.event.service;
 
 import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
