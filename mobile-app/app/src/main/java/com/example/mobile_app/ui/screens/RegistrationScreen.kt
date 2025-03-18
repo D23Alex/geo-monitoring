@@ -2,29 +2,20 @@
 package com.example.mobile_app.ui.screens
 
 import android.content.Context
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RegistrationScreen(onRegistrationSuccess: () -> Unit) {
+fun RegistrationScreen(
+    onRegistrationSuccess: () -> Unit,
+    onNavigateToLogin: () -> Unit // новый параметр для перехода на экран входа
+) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     var username by remember { mutableStateOf("") }
@@ -40,8 +31,7 @@ fun RegistrationScreen(onRegistrationSuccess: () -> Unit) {
             value = username,
             onValueChange = { username = it },
             label = { Text("Имя пользователя") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors()
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -49,8 +39,7 @@ fun RegistrationScreen(onRegistrationSuccess: () -> Unit) {
             onValueChange = { password = it },
             label = { Text("Пароль") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            colors = OutlinedTextFieldDefaults.colors()
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
@@ -77,5 +66,12 @@ fun RegistrationScreen(onRegistrationSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = errorMsg, color = MaterialTheme.colorScheme.error)
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        // Добавляем ссылку для перехода на экран входа
+        Text(
+            text = "Уже есть аккаунт? Войти",
+            modifier = Modifier.clickable { onNavigateToLogin() },
+            color = MaterialTheme.colorScheme.primary
+        )
     }
 }

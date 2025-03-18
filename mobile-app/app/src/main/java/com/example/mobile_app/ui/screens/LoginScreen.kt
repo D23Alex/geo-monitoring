@@ -78,7 +78,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(8.dp))
         // Ссылка на регистрацию
         Text(
-            text = "Нет аккаунта? Зарегистрироваться",
+            text = "Зарегистрироваться",
             modifier = Modifier.clickable { onNavigateToRegistration() },
             color = MaterialTheme.colorScheme.primary
         )
