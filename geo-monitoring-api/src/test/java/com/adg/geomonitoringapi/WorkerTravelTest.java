@@ -72,7 +72,7 @@ public class WorkerTravelTest {
 
         eventRepository.saveAll(events);
 
-        SystemState state = stateService.getCurrentState();
+        SystemState state = stateService.getLatestState();
 
         assertEquals(1, 1);
 

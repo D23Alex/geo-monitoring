@@ -38,7 +38,7 @@ public abstract class Event {
 
     // Метод, который действительно поочередно вызывается на последовательности ивентов для получения стейта
     public SystemState updateState(SystemState oldState) {
-        return apply(oldState).withLastEvent(this);
+        return apply(oldState).withLastEvent(this).withEventsApplied(oldState.getEventsApplied() + 1);
     }
 
     // Метод, который нужно переопределять

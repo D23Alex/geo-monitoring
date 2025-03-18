@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -27,9 +28,12 @@ public final class SystemState {
     private Map<Long, WorkerState> workers;
     private Map<Long, WorkAbsenceState> absences;
     private Event lastEvent;
+    private Long eventsApplied = 0L;
 
-    public static Set<Worker> idleWorkers() {
-        return null; //TODO: implement
+    public Set<Worker> idleWorkers() {
+        return workers.values().stream()
+                .filter(WorkerState::isIdle)
+                .map(WorkerState::toWorker).collect(Collectors.toSet());
     }
 
     public static SystemState initial() {
@@ -38,7 +42,8 @@ public final class SystemState {
                 Map.of(),
                 Map.of(),
                 Map.of(),
-                NothingHappenedEvent.builder().id(0L).timestamp(Instant.EPOCH).build()
+                NothingHappenedEvent.builder().id(0L).timestamp(Instant.EPOCH).build(),
+                0L
         );
     }
 

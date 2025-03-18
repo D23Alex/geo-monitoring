@@ -13,6 +13,6 @@ public class StateController {
 
     @GetMapping("/api/current-state")
     public SystemState getCurrentState() {
-        return stateService.getCurrentState();
+        return stateService.getLatestState();
     }
 }

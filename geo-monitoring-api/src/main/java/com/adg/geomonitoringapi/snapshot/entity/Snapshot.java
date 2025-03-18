@@ -15,7 +15,7 @@ public class Snapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Instant snapshotTime;
+    private Instant timestamp;
 
     // Храним сериализованное состояние системы (например, в формате JSON)
     @Lob

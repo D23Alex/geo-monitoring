@@ -3,6 +3,7 @@ package com.adg.geomonitoringapi.state;
 
 import com.adg.geomonitoringapi.event.Point;
 import com.adg.geomonitoringapi.geometry.Geometry;
+import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.*;
 
 import java.time.Instant;
@@ -21,6 +22,14 @@ public final class WorkerState {
     private String name;
     @Builder.Default
     TreeMap<Instant, Point> travelHistory = new TreeMap<>();
+
+    public WorkerState(Worker worker) {
+        this.name = worker.getName();
+    }
+
+    public Worker toWorker() {
+        return Worker.builder().name(name).build();
+    }
 
     public Point lastKnownPosition() {
         return travelHistory.get(travelHistory.lastKey());

@@ -24,14 +24,14 @@ public class SnapshotService {
     public SystemState getCurrentState() {
         // Получаем последний снапшот, если он существует
         Snapshot latestSnapshot = snapshotRepository.findAll().stream()
-                .max(Comparator.comparing(Snapshot::getSnapshotTime))
+                .max(Comparator.comparing(Snapshot::getTimestamp))
                 .orElse(null);
         SystemState state;
         Instant snapshotTime = Instant.EPOCH;
         if (latestSnapshot != null) {
             try {
                 state = objectMapper.readValue(latestSnapshot.getStateJson(), SystemState.class);
-                snapshotTime = latestSnapshot.getSnapshotTime();
+                snapshotTime = latestSnapshot.getTimestamp();
             } catch (Exception e) {
                 state = SystemState.initial();
             }
@@ -58,7 +58,7 @@ public class SnapshotService {
     public void createSnapshot() {
         SystemState state = getCurrentState();
         Snapshot snapshot = new Snapshot();
-        snapshot.setSnapshotTime(Instant.now());
+        snapshot.setTimestamp(Instant.now());
         try {
             snapshot.setStateJson(objectMapper.writeValueAsString(state));
         } catch (Exception e) {
