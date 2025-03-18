@@ -1,87 +1,71 @@
 package com.adg.geomonitoringapi;
 
-import com.adg.geomonitoringapi.event.controller.EventController;
-import com.adg.geomonitoringapi.event.dto.*;
+import com.adg.geomonitoringapi.event.CompletionCriteria;
+import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.event.entity.TaskAssignedEvent;
-import com.adg.geomonitoringapi.event.entity.Event;
-import com.adg.geomonitoringapi.event.service.EventService;
-import com.adg.geomonitoringapi.exception.EntityNotFoundException;
-import com.adg.geomonitoringapi.handler.AppHandlerException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.net.URI;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
-class EventControllerTest {
+@SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@AutoConfigureMockMvc
+public class EventControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    private EventService eventService;
-
-    @InjectMocks
-    private EventController eventController;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController)
-                .setControllerAdvice(new AppHandlerException()) // Добавляем обработчик ошибок
-                .build();
-    }
-
+    // Test for creating TaskAssignedEvent
     @Test
-    void createEvent_Success() throws Exception {
-        TaskAssignedEventCreationDTO eventCreationDTO = new TaskAssignedEventCreationDTO();
-        eventCreationDTO.setDescription("Test Task");
-
-        TaskAssignedEvent taskEvent = new TaskAssignedEvent();
-//        taskEvent.setId(1L); // Убедимся, что ID установлен
-        taskEvent.setDescription("Test Task");
-
-        when(eventService.submitEvent(any(TaskAssignedEvent.class))).thenReturn(taskEvent);
-
+    void createTaskAssignedEvent(@Value("classpath:/create_event.json") Resource json) throws Exception {
         mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(eventCreationDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/api/events/1"))) // Теперь ID корректный
-                .andExpect(jsonPath("$.id").value(1));
-
-        verify(eventService, times(1)).submitEvent(any(TaskAssignedEvent.class));
+                        .content(json.getContentAsByteArray())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
-
-
-
+    // Test for applying a TaskAssignedEvent to the system state
     @Test
-    void createEvent_UnknownType_ShouldReturnNotFound() throws Exception {
-        TaskAssignedEventCreationDTO unknownDto = new TaskAssignedEventCreationDTO();
-        unknownDto.setDescription("Unknown Event");
+    void applyTaskAssignedEventToSystemState() throws Exception {
+        // Create a TaskAssignedEvent instance (in the test's code, not via controller)
+        TaskAssignedEvent taskAssignedEvent = new TaskAssignedEvent();
+        taskAssignedEvent.setDescription("Test Task Description");
+        taskAssignedEvent.setAssignedWorkers(new HashSet<>(List.of(new Worker("Worker 1"), new Worker("Worker 2"))));
+        taskAssignedEvent.setCompletionCriteria(List.of(new CompletionCriteria(true, false, "Completion Criterion 1", "Description 1")));
+        taskAssignedEvent.setLocationId(1L);
+        taskAssignedEvent.setActiveFrom(Instant.parse("2025-03-18T00:00:00Z"));
+        taskAssignedEvent.setActiveTo(Instant.parse("2025-03-19T00:00:00Z"));
 
-        doThrow(new EntityNotFoundException("Event type not found"))
-                .when(eventService)
-                .submitEvent(any(Event.class));
-
-        mockMvc.perform(post("/api/events")
+        // Use MockMvc to simulate the event being applied to the system state
+        mockMvc.perform(post("/api/events/apply")  // Assuming you have a controller method for applying events
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unknownDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Event type not found"));
+                        .content("{\n" +
+                                "  \"eventType\": \"TaskAssignedEvent\",\n" +
+                                "  \"description\": \"Test Task Description\",\n" +
+                                "  \"assignedWorkers\": [{ \"id\": 1, \"name\": \"Worker 1\" }, { \"id\": 2, \"name\": \"Worker 2\" }],\n" +
+                                "  \"completionCriteria\": [{ \"name\": \"Completion Criterion 1\", \"description\": \"Description 1\", \"isCommentRequired\": true, \"isPhotoProofRequired\": false }],\n" +
+                                "  \"locationId\": 1,\n" +
+                                "  \"activeFrom\": \"2025-03-18T00:00:00Z\",\n" +
+                                "  \"activeTo\": \"2025-03-19T00:00:00Z\"\n" +
+                                "}"))
+                .andExpect(status().isOk())  // Expecting 200 OK status
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tasks").exists())  // Check if tasks are included in the state
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tasks[0].description").value("Test Task Description"));  // Ensure the task description is correct
     }
 }

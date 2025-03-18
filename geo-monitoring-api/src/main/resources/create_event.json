@@ -1,0 +1,7 @@
+{
+  "worker_id": 1,
+  "description": "Test Task Description",
+  "assigned_worker_ids": [1, 2],
+  "completion_criteria": "Completion Criterion 1",
+  "location_creation_event_id": 1
+}
