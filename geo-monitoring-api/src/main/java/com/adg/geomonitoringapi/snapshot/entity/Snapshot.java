@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.Instant;
 
+@Builder
 @Entity
 @Setter
 @Getter

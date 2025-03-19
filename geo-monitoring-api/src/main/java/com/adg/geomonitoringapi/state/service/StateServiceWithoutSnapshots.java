@@ -1,6 +1,5 @@
 package com.adg.geomonitoringapi.state.service;
 
-import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.adg.geomonitoringapi.state.SystemState;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
-public class StateServiceImpl implements StateService {
+public class StateServiceWithoutSnapshots implements StateService {
     private final EventRepository eventRepository;
 
     @Override
