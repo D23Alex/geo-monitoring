@@ -13,8 +13,8 @@ import java.util.Set;
 @Builder
 @With
 public final class GroupState {
-    private Set<Worker> workers;
-    private Worker foreman;
+    private Set<Long> workerIds;
+    private Long foremanId;
     private Instant createdAt;
     private Instant activeFrom;
     private Instant activeTo;

@@ -12,6 +12,7 @@ import java.time.Instant;
 @Builder
 @With
 public class WorkAbsenceState {
+    WorkerState worker;
     Instant absenceRequestedFrom;
     Instant absenceRequestedTo;
     AbsenceReason absenceReason;

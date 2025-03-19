@@ -74,8 +74,6 @@ public class WorkerTravelTest {
 
         SystemState state = stateService.getLatestState();
 
-        assertEquals(1, 1);
-
         assertEquals(new Point(60.4, 50.4), state.getWorkers().get(1L).lastKnownPosition());
 
         assertEquals(

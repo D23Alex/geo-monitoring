@@ -3,12 +3,15 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.state.GroupState;
 import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
+import com.adg.geomonitoringapi.state.WorkerState;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -16,20 +19,18 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table
+@SuperBuilder
 public class WorkerGroupCreationEvent extends Event {
     private Worker foreman;
-    @ElementCollection
+    @ElementCollection //TODO: заменить во всех ивентах Worker на передачу id
     private Set<Worker> workers;
     Instant groupActiveFrom;
     Instant groupActiveTo;
-    Instant timestamp;
 
     @Override
     public SystemState apply(SystemState oldState) {
         GroupState newGroup = GroupState.builder()
-                .workers(workers)
+                .workerIds(workers.stream().map(WorkerState::new).collect(Collectors.toSet()))
                 .foreman(foreman)
                 .activeFrom(groupActiveFrom)
                 .activeTo(groupActiveTo)
