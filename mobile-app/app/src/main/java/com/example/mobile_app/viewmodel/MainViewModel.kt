@@ -1,6 +1,7 @@
 package com.example.mobile_app.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile_app.model.Event
 import com.example.mobile_app.model.SystemState
@@ -9,16 +10,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
-    private val repository = EventRepository()
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = EventRepository(application)
 
     private val _systemState = MutableStateFlow<SystemState?>(null)
     val systemState: StateFlow<SystemState?> = _systemState
 
     fun loadSystemState() {
         viewModelScope.launch {
-            val result = repository.getCurrentState()
-            result.onSuccess { state ->
+            repository.getCurrentState().onSuccess { state ->
                 _systemState.value = state
             }.onFailure {
                 // Обработка ошибки (например, через уведомление или логирование)
@@ -28,12 +28,19 @@ class MainViewModel : ViewModel() {
 
     fun sendEvent(event: Event) {
         viewModelScope.launch {
-            val result = repository.sendEvent(event)
-            result.onSuccess { response ->
+            repository.sendEvent(event).onSuccess { response ->
                 // Обработка успешного ответа (например, обновление UI или логирование)
             }.onFailure { error ->
                 // Обработка ошибки
             }
+        }
+    }
+
+    // Функция для периодической попытки отправки неотправленных событий,
+    // её можно вызвать, например, при запуске приложения или через WorkManager.
+    fun retrySendingEvents() {
+        viewModelScope.launch {
+            repository.resendUnsentEvents()
         }
     }
 }

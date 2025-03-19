@@ -1,7 +1,5 @@
-// LoginScreen.kt
 package com.example.mobile_app.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
+import com.example.mobile_app.repository.ClientDataRepository
 
 @Composable
 fun LoginScreen(
@@ -32,23 +28,20 @@ fun LoginScreen(
     onNavigateToRegistration: () -> Unit
 ) {
     val context = LocalContext.current
-    val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    // Используем безопасное хранилище для данных клиента
+    val clientRepo = ClientDataRepository(context)
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Вход", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
             label = { Text("Имя пользователя") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors()
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -56,27 +49,20 @@ fun LoginScreen(
             onValueChange = { password = it },
             label = { Text("Пароль") },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation(),
-            colors = OutlinedTextFieldDefaults.colors()
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                val storedUsername = prefs.getString("username", "")
-                val storedPassword = prefs.getString("password", "")
-                if (username == storedUsername && password == storedPassword) {
-                    prefs.edit() { putBoolean("isLoggedIn", true) }
-                    onLoginSuccess()
-                } else {
-                    errorMsg = "Неверные учетные данные"
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Button(onClick = {
+            val storedData = clientRepo.getClientData()
+            if (storedData != null && username == storedData.login && password == storedData.password) {
+                onLoginSuccess()
+            } else {
+                errorMsg = "Неверные учетные данные"
+            }
+        }, modifier = Modifier.fillMaxWidth()) {
             Text("Войти")
         }
         Spacer(modifier = Modifier.height(8.dp))
-        // Ссылка на регистрацию
         Text(
             text = "Зарегистрироваться",
             modifier = Modifier.clickable { onNavigateToRegistration() },

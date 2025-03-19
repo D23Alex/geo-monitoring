@@ -1,9 +1,6 @@
 package com.example.mobile_app.model
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.gson.annotations.SerializedName
-import java.time.Instant
 
 
 // Базовый тип для всех событий
@@ -137,9 +134,3 @@ data class Point(
     @SerializedName("latitude") val latitude: Double,
     @SerializedName("longitude") val longitude: Double
 )
-
-data class SystemState(
-    val lastEvent: Event? = null
-) {
-    fun withLastEvent(event: Event): SystemState = copy(lastEvent = event)
-}
