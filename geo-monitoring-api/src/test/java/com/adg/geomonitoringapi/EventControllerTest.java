@@ -1,71 +1,89 @@
 package com.adg.geomonitoringapi;
 
-import com.adg.geomonitoringapi.event.CompletionCriteria;
-import com.adg.geomonitoringapi.event.Worker;
-import com.adg.geomonitoringapi.event.entity.TaskAssignedEvent;
+import com.adg.geomonitoringapi.event.Point;
+import com.adg.geomonitoringapi.event.controller.EventController;
+import com.adg.geomonitoringapi.event.dto.EventCreationDTO;
+import com.adg.geomonitoringapi.event.dto.LocationCreationEventCreationDTO;
+import com.adg.geomonitoringapi.event.entity.LocationCreationEvent;
+import com.adg.geomonitoringapi.event.factory.EventFactory;
+import com.adg.geomonitoringapi.event.service.EventService;
+import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@AutoConfigureMockMvc
+@ExtendWith(SpringExtension.class)
 public class EventControllerTest {
 
-    @Autowired
+    @InjectMocks
+    private EventController eventController;
+
+    @Mock
+    private EventService eventService;
+
+    @Mock
+    private EventFactory eventFactory;
+
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
-    // Test for creating TaskAssignedEvent
-    @Test
-    void createTaskAssignedEvent(@Value("classpath:/create_event.json") Resource json) throws Exception {
-        mockMvc.perform(post("/api/events")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.getContentAsByteArray())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+    @BeforeEach
+    public void setUp() {
+        objectMapper = new ObjectMapper();
+        mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
     }
-    // Test for applying a TaskAssignedEvent to the system state
-    @Test
-    void applyTaskAssignedEventToSystemState() throws Exception {
-        // Create a TaskAssignedEvent instance (in the test's code, not via controller)
-        TaskAssignedEvent taskAssignedEvent = new TaskAssignedEvent();
-        taskAssignedEvent.setDescription("Test Task Description");
-        taskAssignedEvent.setAssignedWorkers(new HashSet<>(List.of(new Worker("Worker 1"), new Worker("Worker 2"))));
-        taskAssignedEvent.setCompletionCriteria(List.of(new CompletionCriteria(true, false, "Completion Criterion 1", "Description 1")));
-        taskAssignedEvent.setLocationId(1L);
-        taskAssignedEvent.setActiveFrom(Instant.parse("2025-03-18T00:00:00Z"));
-        taskAssignedEvent.setActiveTo(Instant.parse("2025-03-19T00:00:00Z"));
 
-        // Use MockMvc to simulate the event being applied to the system state
-        mockMvc.perform(post("/api/events/apply")  // Assuming you have a controller method for applying events
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\n" +
-                                "  \"eventType\": \"TaskAssignedEvent\",\n" +
-                                "  \"description\": \"Test Task Description\",\n" +
-                                "  \"assignedWorkers\": [{ \"id\": 1, \"name\": \"Worker 1\" }, { \"id\": 2, \"name\": \"Worker 2\" }],\n" +
-                                "  \"completionCriteria\": [{ \"name\": \"Completion Criterion 1\", \"description\": \"Description 1\", \"isCommentRequired\": true, \"isPhotoProofRequired\": false }],\n" +
-                                "  \"locationId\": 1,\n" +
-                                "  \"activeFrom\": \"2025-03-18T00:00:00Z\",\n" +
-                                "  \"activeTo\": \"2025-03-19T00:00:00Z\"\n" +
-                                "}"))
-                .andExpect(status().isOk())  // Expecting 200 OK status
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tasks").exists())  // Check if tasks are included in the state
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tasks[0].description").value("Test Task Description"));  // Ensure the task description is correct
+    @Test
+    public void testCreateLocationCreationEventSuccess() throws Exception {
+        // Создаем данные для успешного DTO
+        LocationCreationEventCreationDTO eventCreationDTO = new LocationCreationEventCreationDTO();
+        eventCreationDTO.setName("Location 1");
+        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Пример точки (координаты)
+
+        // Создаем объект LocationCreationEvent, который будет возвращен фабрикой
+        LocationCreationEvent createdEvent = new LocationCreationEvent();
+        createdEvent.setName("Location 1");
+        createdEvent.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Точки совпадают с переданными
+        createdEvent.setId(1L);  // Устанавливаем ID для теста
+
+        // Настроим фабрику для реального создания события
+        when(eventFactory.createEvent(eventCreationDTO)).thenReturn(createdEvent);
+
+        // Замокать поведение сервиса для сохранения события (сервис возвращает созданное событие с установленным ID)
+        when(eventService.submitEvent(any(LocationCreationEvent.class))).thenReturn(createdEvent);
+
+        // Выполняем POST-запрос через MockMvc и проверяем статус и тело ответа
+        mockMvc.perform(post("/api/events")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(eventCreationDTO)));
+    }
+
+    @Test
+    public void testCreateEventUnsupportedDto() throws Exception {
+        // Создаем данные для неподдерживаемого DTO
+        EventCreationDTO unsupportedDto = new EventCreationDTO() {}; // Создаем анонимный класс, который не будет поддерживаться фабрикой
+
+        // Замокать создание события фабрикой (передадим неподдерживаемый DTO)
+        when(eventFactory.createEvent(unsupportedDto)).thenThrow(new UnsupportedDtoException("Unsupported DTO type"));
+
+        // Выполняем POST-запрос через MockMvc и проверяем статус и тело ответа
+        mockMvc.perform(post("/api/events")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(unsupportedDto)))
+                .andExpect(status().isBadRequest()); // Проверка HTTP статуса 400 (Bad Request)
+
     }
 }

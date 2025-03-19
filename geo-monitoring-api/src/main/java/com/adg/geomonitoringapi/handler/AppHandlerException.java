@@ -1,6 +1,7 @@
 package com.adg.geomonitoringapi.handler;
 
 import com.adg.geomonitoringapi.exception.EntityNotFoundException;
+import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,11 @@ public class AppHandlerException {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
         return buildResponseEntity(HttpStatus.NOT_FOUND, "Entity Not Found", ex.getMessage());
+    }
+
+    @ExceptionHandler(UnsupportedDtoException.class)
+    public ResponseEntity<Map<String, Object>> handleUnsupportedDtoException(UnsupportedDtoException ex) {
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Unsupported DTO", ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> buildResponseEntity(HttpStatus status, String error, String message) {

@@ -3,14 +3,12 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.event.Point;
 import com.adg.geomonitoringapi.state.LocationState;
 import com.adg.geomonitoringapi.state.SystemState;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -18,8 +16,10 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
+@Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class LocationCreationEvent extends Event {
     private String name;
 
