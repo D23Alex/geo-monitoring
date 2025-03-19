@@ -23,7 +23,6 @@ fun ObjectsListScreen(navController: NavHostController) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Text("Список объектов", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn {
             items(objects) { obj ->

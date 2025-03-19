@@ -8,30 +8,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mobile_app.ui.DrawerContent
 import com.example.mobile_app.ui.navigation.AppNavHost
 import com.example.mobile_app.ui.theme.MobileAppTheme
-import com.example.mobile_app.ui.DrawerContent
 import com.example.mobile_app.worker.LocationService
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material3.rememberDrawerState
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -76,27 +70,28 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainApp(startDestination: String) {
     val navController = rememberNavController()
-    // Получаем текущий маршрут
+    // Определяем текущий маршрут
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    // Список маршрутов, относящихся к авторизации
     val authRoutes = listOf("login", "registration")
-    // Если текущего маршрута ещё нет или он относится к авторизации,
-    // отображаем простой Scaffold (без Drawer и TopAppBar)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    // Создаем drawerState в композируемом контексте
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
     if (currentBackStackEntry?.destination?.route == null ||
         currentBackStackEntry!!.destination.route in authRoutes
     ) {
+        // Экраны авторизации – без бокового меню
         Scaffold { innerPadding ->
             AppNavHost(
                 navController = navController,
                 startDestination = startDestination,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(innerPadding),
+                onDrawerClicked = {} // не используется для auth-экранов
             )
         }
     } else {
-        // Если пользователь уже авторизован – показываем основной интерфейс с боковым меню
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
-        val context = LocalContext.current
+        // Остальные экраны – с Drawer
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -110,7 +105,6 @@ fun MainApp(startDestination: String) {
                         }
                     },
                     onExitClicked = {
-                        // Сброс авторизации и переход на экран входа
                         val prefs: SharedPreferences =
                             context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
                         prefs.edit { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
@@ -122,24 +116,11 @@ fun MainApp(startDestination: String) {
                 )
             }
         ) {
-            Scaffold(
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        title = { Text("Mobile App") },
-                        navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Меню")
-                            }
-                        }
-                    )
-                }
-            ) { innerPadding ->
-                AppNavHost(
-                    navController = navController,
-                    startDestination = startDestination,
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
+            AppNavHost(
+                navController = navController,
+                startDestination = startDestination,
+                onDrawerClicked = { scope.launch { drawerState.open() } }
+            )
         }
     }
 }

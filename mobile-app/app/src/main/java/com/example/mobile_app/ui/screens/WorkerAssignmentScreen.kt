@@ -14,7 +14,6 @@ fun WorkerAssignmentScreen(workerName: String?, objectName: String?) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Text("Назначение работника на объект", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = assignedWorker,

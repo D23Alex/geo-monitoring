@@ -23,7 +23,6 @@ fun ObjectTasksScreen(objectId: String) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Text("Задачи для объекта $objectId", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         LazyColumn {
             items(tasks) { task ->

@@ -13,7 +13,6 @@ fun TaskAssignmentScreen() {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Text("Назначение задач на объекты", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = taskDescription,

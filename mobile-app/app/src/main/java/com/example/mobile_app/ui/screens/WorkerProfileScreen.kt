@@ -13,7 +13,6 @@ fun WorkerProfileScreen(navController: NavController, workerName: String?) {
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp)) {
-        Text("Профиль рабочего", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = "Имя: ${workerName ?: "Неизвестно"}", style = MaterialTheme.typography.bodyLarge)
         // Дополнительная информация о рабочем
