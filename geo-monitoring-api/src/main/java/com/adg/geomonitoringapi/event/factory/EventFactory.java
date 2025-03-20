@@ -2,34 +2,34 @@ package com.adg.geomonitoringapi.event.factory;
 
 import com.adg.geomonitoringapi.event.dto.*;
 import com.adg.geomonitoringapi.event.entity.*;
+import com.adg.geomonitoringapi.exception.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class EventFactory {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
+    private static final Map<Class<? extends EventCreationDTO>, Class<? extends Event>> eventMap = new HashMap<>();
+
+    static {
+        eventMap.put(LocationCreationEventCreationDTO.class, LocationCreationEvent.class);
+        eventMap.put(AbnormalSituationEventCreationDTO.class, AbnormalSituationEvent.class);
+        eventMap.put(TaskAssignedEventCreationDTO.class, TaskAssignedEvent.class);
+        eventMap.put(TaskCancelledEventCreationDTO.class, TaskCancelledEvent.class);
+        eventMap.put(TaskCompletedEventCreationDTO.class, TaskCompletedEvent.class);
+        eventMap.put(WorkerGroupCreationEventCreationDTO.class, WorkerGroupCreationEvent.class);
+    }
+
     public Event createEvent(EventCreationDTO eventCreationDTO) {
-        if (eventCreationDTO instanceof LocationCreationEventCreationDTO locationCreationDTO) {
-            return modelMapper.map(locationCreationDTO, LocationCreationEvent.class);
+        Class<? extends Event> eventClass = eventMap.get(eventCreationDTO.getClass());
+        if (eventClass == null) {
+            throw new EntityNotFoundException("Entity not found");
         }
-        if (eventCreationDTO instanceof AbnormalSituationEventCreationDTO abnormalDTO) {
-            return modelMapper.map(abnormalDTO, AbnormalSituationEvent.class);
-        }
-        if (eventCreationDTO instanceof TaskAssignedEventCreationDTO taskAssignedDTO) {
-            return modelMapper.map(taskAssignedDTO, TaskAssignedEvent.class);
-        }
-        if (eventCreationDTO instanceof TaskCancelledEventCreationDTO taskCancelledEventCreationDTO) {
-            return modelMapper.map(taskCancelledEventCreationDTO, TaskCancelledEvent.class);
-        }
-        if (eventCreationDTO instanceof TaskCompletedEventCreationDTO taskCompletedEventCreationDTO) {
-            return modelMapper.map(taskCompletedEventCreationDTO, TaskCompletedEvent.class);
-        }
-        if (eventCreationDTO instanceof WorkerGroupCreationEventCreationDTO workerGroupCreationEventCreationDTO) {
-            return modelMapper.map(workerGroupCreationEventCreationDTO, WorkerGroupCreationEvent.class);
-        }
-        // Добавляем другие типы событий здесь, если нужно
-        throw new IllegalArgumentException("Unsupported Event DTO type: " + eventCreationDTO.getClass().getName());
+        return modelMapper.map(eventCreationDTO, eventClass);
     }
 }

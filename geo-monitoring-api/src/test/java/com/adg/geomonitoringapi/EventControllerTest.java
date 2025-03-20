@@ -1,89 +1,119 @@
 package com.adg.geomonitoringapi;
 
 import com.adg.geomonitoringapi.event.Point;
-import com.adg.geomonitoringapi.event.controller.EventController;
 import com.adg.geomonitoringapi.event.dto.EventCreationDTO;
 import com.adg.geomonitoringapi.event.dto.LocationCreationEventCreationDTO;
-import com.adg.geomonitoringapi.event.entity.LocationCreationEvent;
-import com.adg.geomonitoringapi.event.factory.EventFactory;
-import com.adg.geomonitoringapi.event.service.EventService;
-import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
+import com.adg.geomonitoringapi.event.repository.EventRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Instant;
 import java.util.Set;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
+@Testcontainers
+@EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
+@Slf4j
 public class EventControllerTest {
 
-    @InjectMocks
-    private EventController eventController;
+    @Container
+    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("postgres")
+            .withUsername("postgres")
+            .withPassword("postgres");
 
-    @Mock
-    private EventService eventService;
-
-    @Mock
-    private EventFactory eventFactory;
-
+    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
-        objectMapper = new ObjectMapper();
-        mockMvc = MockMvcBuilders.standaloneSetup(eventController).build();
+        System.setProperty("spring.datasource.url", postgresContainer.getJdbcUrl());
+        System.setProperty("spring.datasource.username", postgresContainer.getUsername());
+        System.setProperty("spring.datasource.password", postgresContainer.getPassword());
+        eventRepository.deleteAll();
     }
 
     @Test
     public void testCreateLocationCreationEventSuccess() throws Exception {
-        // Создаем данные для успешного DTO
         LocationCreationEventCreationDTO eventCreationDTO = new LocationCreationEventCreationDTO();
         eventCreationDTO.setName("Location 1");
-        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Пример точки (координаты)
+        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060),
+                new Point(30.1235, 59.3432)));
+        eventCreationDTO.setTimestamp(Instant.now());
 
-        // Создаем объект LocationCreationEvent, который будет возвращен фабрикой
-        LocationCreationEvent createdEvent = new LocationCreationEvent();
-        createdEvent.setName("Location 1");
-        //createdEvent.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Точки совпадают с переданными
-        createdEvent.setId(1L);  // Устанавливаем ID для теста
-
-        // Настроим фабрику для реального создания события
-        when(eventFactory.createEvent(eventCreationDTO)).thenReturn(createdEvent);
-
-        // Замокать поведение сервиса для сохранения события (сервис возвращает созданное событие с установленным ID)
-        when(eventService.submitEvent(any(LocationCreationEvent.class))).thenReturn(createdEvent);
-
-        // Выполняем POST-запрос через MockMvc и проверяем статус и тело ответа
         mockMvc.perform(post("/api/events")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(eventCreationDTO)));
-    }
+                        .content(objectMapper.writeValueAsString(eventCreationDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Location 1"))
+                .andExpect(jsonPath("$.points[0].latitude").value(30.1235))
+                .andExpect(jsonPath("$.points[0].longitude").value(59.3432))
+                .andExpect(jsonPath("$.points[1].latitude").value(40.7128))
+                .andExpect(jsonPath("$.points[1].longitude").value(-74.006))
+                .andExpect(jsonPath("$.points").isArray())
+                .andExpect(jsonPath("$.timestamp").exists());
 
+        MvcResult result = mockMvc.perform(post("/api/events")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(eventCreationDTO)))
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+
+        log.info("Response Content: {}", responseContent);
+
+    }
     @Test
     public void testCreateEventUnsupportedDto() throws Exception {
-        // Создаем данные для неподдерживаемого DTO
-        EventCreationDTO unsupportedDto = new EventCreationDTO() {}; // Создаем анонимный класс, который не будет поддерживаться фабрикой
+        // Создание неправильного DTO
+        EventCreationDTO unsupportedDto = new EventCreationDTO() {};
 
-        // Замокать создание события фабрикой (передадим неподдерживаемый DTO)
-        when(eventFactory.createEvent(unsupportedDto)).thenThrow(new UnsupportedDtoException("Unsupported DTO type"));
-
-        // Выполняем POST-запрос через MockMvc и проверяем статус и тело ответа
         mockMvc.perform(post("/api/events")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
-                .andExpect(status().isBadRequest()); // Проверка HTTP статуса 400 (Bad Request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Malformed JSON"))
+                .andExpect(jsonPath("$.message").value("Invalid or malformed JSON in the request body"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
+        MvcResult result = mockMvc.perform(post("/api/events")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(unsupportedDto)))
+                .andReturn();
+
+        String responseContent = result.getResponse().getContentAsString();
+
+        log.info("Response Content: {}", responseContent);
     }
 }

@@ -24,7 +24,8 @@ import java.time.Instant;
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCompletedEvent.class, name = "TaskCompletedEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.TaskCancelledEvent.class, name = "TaskCancelledEvent"),
         @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.AbnormalSituationEvent.class, name = "AbnormalSituationEvent"),
-        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent.class, name = "WorkerPositionUpdateEvent")
+        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.WorkerPositionUpdateEvent.class, name = "WorkerPositionUpdateEvent"),
+        @JsonSubTypes.Type(value = com.adg.geomonitoringapi.event.entity.LocationCreationEvent.class, name = "LocationCreationEvent")
 })
 @Table
 @SuperBuilder
@@ -36,11 +37,9 @@ public abstract class Event {
     private Long id;
     private Instant timestamp;
 
-    // Метод, который действительно поочередно вызывается на последовательности ивентов для получения стейта
     public SystemState updateState(SystemState oldState) {
         return apply(oldState).withLastEvent(this).withEventsApplied(oldState.getEventsApplied() + 1);
     }
 
-    // Метод, который нужно переопределять
     public abstract SystemState apply(SystemState oldState);
 }
