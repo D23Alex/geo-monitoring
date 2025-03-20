@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
 @Slf4j
-public class EventControllerIntegrationTest {
+public class EventControllerTest {
 
     @Container
     public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:15")
