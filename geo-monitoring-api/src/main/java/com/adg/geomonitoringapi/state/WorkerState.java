@@ -2,8 +2,8 @@ package com.adg.geomonitoringapi.state;
 
 
 import com.adg.geomonitoringapi.event.Point;
+import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.geometry.Geometry;
-import com.adg.geomonitoringapi.worker.entity.Worker;
 import lombok.*;
 
 import java.time.Instant;

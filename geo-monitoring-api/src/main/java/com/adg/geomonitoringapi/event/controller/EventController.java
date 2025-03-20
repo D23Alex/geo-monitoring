@@ -25,12 +25,16 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventResponseDTO> createEvent(@RequestBody EventCreationDTO eventCreationDTO) {
-        Event event = eventFactory.createEvent(eventCreationDTO);
-
-        Event createdEvent = eventService.submitEvent(event);
-
-        EventResponseDTO eventResponseDTO = mapper.map(createdEvent, EventResponseDTO.class);
-
-        return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
+        try {
+            Event event = eventFactory.createEvent(eventCreationDTO);
+            Event createdEvent = eventService.submitEvent(event);
+            EventResponseDTO eventResponseDTO = mapper.map(createdEvent, EventResponseDTO.class);
+            return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
+        } catch (Exception e) {
+            // Логирование ошибки
+            System.out.println("Ошибка!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

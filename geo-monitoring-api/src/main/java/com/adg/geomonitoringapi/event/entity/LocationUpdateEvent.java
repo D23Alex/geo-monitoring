@@ -24,7 +24,6 @@ public class LocationUpdateEvent extends Event {
     private Long locationId;
 
     @ElementCollection
-    @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
     private Set<Point> points;
 
     @Override

@@ -18,7 +18,8 @@ import lombok.EqualsAndHashCode;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = TaskAssignedEventCreationDTO.class, name = "TaskAssignedEvent"),
         @JsonSubTypes.Type(value = TaskCompletedEventCreationDTO.class, name = "TaskCompletedEvent"),
-        @JsonSubTypes.Type(value = WorkerPositionUpdateEventCreationDTO.class, name = "WorkerPositionUpdateEvent")
+        @JsonSubTypes.Type(value = WorkerPositionUpdateEventCreationDTO.class, name = "WorkerPositionUpdateEvent"),
+        @JsonSubTypes.Type(value = LocationCreationEventCreationDTO.class, name = "LocationCreationEventCreation")
 })
 public class EventCreationDTO extends EventDTO {
 

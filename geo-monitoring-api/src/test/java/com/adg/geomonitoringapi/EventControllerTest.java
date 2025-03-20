@@ -67,8 +67,8 @@ public class EventControllerTest {
 
         // Выполняем POST-запрос через MockMvc и проверяем статус и тело ответа
         mockMvc.perform(post("/api/events")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(eventCreationDTO)));
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(eventCreationDTO)));
     }
 
     @Test

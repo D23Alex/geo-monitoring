@@ -24,7 +24,6 @@ public class LocationCreationEvent extends Event {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
     private Set<Point> points;
 
     @Override
