@@ -29,21 +29,23 @@ class EventRepository(private val context: Context) {
     suspend fun sendEvent(event: Event): Result<EventResponse> {
         val eventJson = gson.toJson(event)
         val signature = SecurityUtil.computeHMAC(eventJson)
+        // Сохраняем событие с isSent = false
         val unsentEvent = UnsentEvent(
             eventJson = eventJson,
             timestamp = event.timestamp,
             eventType = event.eventType,
-            signature = signature
+            signature = signature,
+            isSent = false
         )
-        eventDao.insertEvent(unsentEvent)
+        val unsentEventId = eventDao.insertEvent(unsentEvent)
 
         return withContext(Dispatchers.IO) {
             if (isNetworkAvailable()) {
                 try {
                     val response = apiService.sendEvent(event)
                     if (response.isSuccessful) {
-                        // Если отправка успешна, удаляем событие из локального хранилища
-                        deleteLocalEvent(event)
+                        // Вместо удаления, помечаем событие как отправленное
+                        eventDao.markEventAsSent(unsentEventId)
                         Result.success(response.body()!!)
                     } else {
                         Result.failure(Exception("Ошибка отправки: ${response.code()}"))
@@ -61,23 +63,22 @@ class EventRepository(private val context: Context) {
     suspend fun resendUnsentEvents() {
         if (!isNetworkAvailable()) return
 
-        val pendingEvents = eventDao.getAllEvents()
+        val pendingEvents = eventDao.getAllUnsentEvents()
         for (unsent in pendingEvents) {
             // Проверяем подпись перед отправкой
             if (!SecurityUtil.verifyHMAC(unsent.eventJson, unsent.signature)) {
-                // Если проверка не пройдена, логируем инцидент и пропускаем событие
-                // Можно добавить дополнительную обработку (например, уведомление о проблеме)
-                eventDao.deleteEvent(unsent)
+                // Логирование инцидента, помечаем как отправленное, чтобы не зацикливаться
+                eventDao.markEventAsSent(unsent.id)
                 continue
             }
             try {
                 val event = gson.fromJson(unsent.eventJson, Event::class.java)
                 val response = apiService.sendEvent(event)
                 if (response.isSuccessful) {
-                    eventDao.deleteEvent(unsent)
+                    eventDao.markEventAsSent(unsent.id)
                 }
             } catch (e: Exception) {
-                // Если отправка не удалась, пропускаем и попробуем позже
+                // Если отправка не удалась, пропускаем – попробуем позже
             }
         }
     }
