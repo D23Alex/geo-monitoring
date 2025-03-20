@@ -25,7 +25,7 @@ public class EventController {
     private final ModelMapper mapper = new ModelMapper();
 
     @PostMapping
-    public ResponseEntity<?> createEvent(@RequestBody EventCreationDTO eventCreationDTO) {
+    public ResponseEntity<? extends EventResponseDTO> createEvent(@RequestBody EventCreationDTO eventCreationDTO) {
         Event event = eventFactory.createEvent(eventCreationDTO);
         Event createdEvent = eventService.submitEvent(event);
         EventResponseDTO eventResponseDTO = mapEventToResponseDTO(createdEvent);
@@ -47,6 +47,8 @@ public class EventController {
             return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
         } else if (event instanceof WorkerPositionUpdateEvent) {
             return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
+        } else if (event instanceof CriteriaCompletedEvent) {
+            return mapper.map(event, CriteriaCompletedEventResponseDTO.class);
         } else {
             throw new UnsupportedDtoException("Unsupported DTO");
         }

@@ -19,7 +19,6 @@ public class WorkAbsenceState {
     Interval requestedInterval;
     AbsenceReason absenceReason;
     String reasonComment;
-
     Interval allowedInterval;
     boolean isAbsenceAllowed;
     String verdictComment;
