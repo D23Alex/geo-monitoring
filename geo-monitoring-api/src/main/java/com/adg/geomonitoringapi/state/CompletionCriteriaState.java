@@ -14,4 +14,5 @@ public class CompletionCriteriaState {
     private String description;
     private boolean isCompleted;
     private String comment;
+    private Long completedBy;
 }

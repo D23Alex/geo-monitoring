@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @SuperBuilder
 public class WorkerGroupCreationEvent extends Event {
-    private Worker foreman;
+    private Long foremanId;
     @ElementCollection //TODO: заменить во всех ивентах Worker на передачу id
-    private Set<Worker> workers;
+    private Set<Long> workerIds;
     Instant groupActiveFrom;
     Instant groupActiveTo;
 
     @Override
     public SystemState apply(SystemState oldState) {
         GroupState newGroup = GroupState.builder()
-                .workerIds(workers.stream().map(WorkerState::new).collect(Collectors.toSet()))
-                .foreman(foreman)
+                .workerIds(workerIds)
+                .foremanId(foremanId)
                 .activeFrom(groupActiveFrom)
                 .activeTo(groupActiveTo)
                 .createdAt(getTimestamp())
@@ -41,6 +41,12 @@ public class WorkerGroupCreationEvent extends Event {
         if (oldState.getTasks().containsKey(newGroupId))
             throw new SystemState.StateUpdateException("Невозможно создать группу: группа с id "
                     + newGroupId + " уже существует");
+
+        if (!oldState.getWorkers().keySet().containsAll(workerIds))
+            throw new SystemState.StateUpdateException("Невозможно создать группу: заданных работников не существует");
+
+        if (!oldState.getWorkers().containsKey(foremanId))
+            throw new SystemState.StateUpdateException("Невозможно создать группу: заданного бригадира не существует");
 
         var newGroups = new Hashtable<>(oldState.getGroups());
         newGroups.put(newGroupId, newGroup);

@@ -23,7 +23,7 @@ public class CriteriaCompletedEvent extends Event {
     private Integer criteriaNumber;
     private Instant completedAt;
     private String completionComment;
-    private Worker completedBy;
+    private Long completedBy;
 
     @Override
     public SystemState apply(SystemState oldState) {
@@ -42,7 +42,8 @@ public class CriteriaCompletedEvent extends Event {
 
         CompletionCriteriaState newCompletionCriteria = old
                 .withCompleted(true)
-                .withComment(completionComment);
+                .withComment(completionComment)
+                .withCompletedBy(completedBy);
 
         var newCriteria = new HashMap<>(oldState.getTasks().get(taskId).getCompletionCriteria());
         newCriteria.put(criteriaNumber, newCompletionCriteria);

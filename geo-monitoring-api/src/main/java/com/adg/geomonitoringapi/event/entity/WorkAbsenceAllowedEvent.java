@@ -17,7 +17,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkAbsenceAllowedEvent extends Event {
-    //TODO: возможно дополнить в зависимости от того, кто выности вердикт: бригадир или админ
+    //TODO: возможно дополнить в зависимости от того, кто выносит вердикт: бригадир или админ
     private Long absenceId;
     Instant absenceAllowedFrom;
     Instant absenceAllowedTo;

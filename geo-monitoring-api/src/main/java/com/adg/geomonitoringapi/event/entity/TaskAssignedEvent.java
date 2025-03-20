@@ -29,7 +29,7 @@ import java.util.Set;
 public class TaskAssignedEvent extends Event {
     private String description;
     @ElementCollection
-    private Set<Worker> assignedWorkers;
+    private Set<Long> assignedWorkers;
     @ElementCollection
     private List<CompletionCriteria> completionCriteria;
     private Long locationId;
@@ -41,6 +41,9 @@ public class TaskAssignedEvent extends Event {
         if (!oldState.getLocations().containsKey(locationId))
             throw new SystemState.StateUpdateException("Невозможно создать задачу: локация с id "
                     + locationId + " не существует");
+
+        if (!oldState.getWorkers().keySet().containsAll(assignedWorkers))
+            throw new SystemState.StateUpdateException("Невозможно создать задачу: работник не найден");
 
         Map<Integer, CompletionCriteriaState> completionCriteriaStates = new HashMap<>();
         for (int i = 0; i < completionCriteria.size(); i++) {

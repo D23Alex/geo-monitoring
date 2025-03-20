@@ -17,7 +17,7 @@ import java.util.Set;
 public class TaskState {
     private String description;
     // Работники, назначенные на задачу
-    private Set<Worker> assignedWorkers = new HashSet<>();
+    private Set<Long> assignedWorkers = new HashSet<>();
     private TaskStatus status;
     private Map<Integer, CompletionCriteriaState> completionCriteria;
     private Instant createdAt;
