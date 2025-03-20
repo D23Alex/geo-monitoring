@@ -8,5 +8,6 @@ data class UnsentEvent(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val eventJson: String, // сериализованное событие
     val timestamp: String, // можно использовать ISO-8601 формат
-    val eventType: String
+    val eventType: String,
+    val signature: String  // цифровая подпись HMAC
 )

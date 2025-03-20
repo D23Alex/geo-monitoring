@@ -11,6 +11,7 @@ import com.example.mobile_app.model.EventResponse
 import com.example.mobile_app.model.SystemState
 import com.example.mobile_app.model.toCachedState
 import com.example.mobile_app.network.ApiClient
+import com.example.mobile_app.security.SecurityUtil
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,13 +25,15 @@ class EventRepository(private val context: Context) {
     private val eventDao = localDb.eventDao()
     private val gson = Gson()
 
-    // Отправка события с сохранением локально и попыткой отправки при наличии сети
+    // Отправка события с сохранением локально с вычисленной подписью
     suspend fun sendEvent(event: Event): Result<EventResponse> {
-        // Сохраняем событие локально (при необходимости можно использовать шифрованное хранилище)
+        val eventJson = gson.toJson(event)
+        val signature = SecurityUtil.computeHMAC(eventJson)
         val unsentEvent = UnsentEvent(
-            eventJson = gson.toJson(event),
+            eventJson = eventJson,
             timestamp = event.timestamp,
-            eventType = event.eventType
+            eventType = event.eventType,
+            signature = signature
         )
         eventDao.insertEvent(unsentEvent)
 
@@ -46,22 +49,27 @@ class EventRepository(private val context: Context) {
                         Result.failure(Exception("Ошибка отправки: ${response.code()}"))
                     }
                 } catch (e: Exception) {
-                    // Если возникла ошибка (например, сбой сети), событие уже сохранено локально
                     Result.failure(e)
                 }
             } else {
-                // Сеть недоступна – возвращаем ошибку, уведомляя, что событие сохранено для последующей отправки
                 Result.failure(Exception("Сеть недоступна. Событие сохранено локально и будет отправлено при восстановлении соединения."))
             }
         }
     }
 
-    // Пытаемся отправить все сохранённые неотправленные события
+    // Пытаемся отправить все сохранённые неотправленные события с проверкой целостности
     suspend fun resendUnsentEvents() {
         if (!isNetworkAvailable()) return
 
         val pendingEvents = eventDao.getAllEvents()
         for (unsent in pendingEvents) {
+            // Проверяем подпись перед отправкой
+            if (!SecurityUtil.verifyHMAC(unsent.eventJson, unsent.signature)) {
+                // Если проверка не пройдена, логируем инцидент и пропускаем событие
+                // Можно добавить дополнительную обработку (например, уведомление о проблеме)
+                eventDao.deleteEvent(unsent)
+                continue
+            }
             try {
                 val event = gson.fromJson(unsent.eventJson, Event::class.java)
                 val response = apiService.sendEvent(event)
@@ -74,7 +82,7 @@ class EventRepository(private val context: Context) {
         }
     }
 
-    // Удаляем локальное событие по совпадению по timestamp и eventType (упрощённо)
+    // Удаляем локальное событие по совпадению по timestamp и eventType
     private suspend fun deleteLocalEvent(event: Event) {
         val pendingEvents = eventDao.getAllEvents().filter {
             it.eventType == event.eventType && it.timestamp == event.timestamp
@@ -82,15 +90,15 @@ class EventRepository(private val context: Context) {
         pendingEvents.forEach { eventDao.deleteEvent(it) }
     }
 
-    // Периодически создаём снапшот (например, удаляем события старше 1 дня)
+    // Периодическая очистка старых событий (например, старше 1 дня)
     suspend fun createSnapshotAndCleanOldEvents() {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
         val cutoff = sdf.format(Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000))
         eventDao.deleteEventsOlderThan(cutoff)
-        // Здесь можно сохранить текущее состояние в отдельной таблице (с использованием шифрования при необходимости)
+        // Дополнительно можно сохранять текущее состояние в отдельной таблице
     }
 
-    // Получение текущего состояния системы с учетом оффлайн-кеша
+    // Получение текущего состояния системы с использованием оффлайн-кеша
     suspend fun getCurrentState(): Result<SystemState> {
         return withContext(Dispatchers.IO) {
             if (isNetworkAvailable()) {
@@ -98,23 +106,19 @@ class EventRepository(private val context: Context) {
                     val response = apiService.getCurrentState()
                     if (response.isSuccessful) {
                         val state = response.body()!!
-                        // Сохраняем полученное состояние в локальный кэш
                         localDb.systemStateDao().insertState(state.toCachedState())
                         Result.success(state)
                     } else {
-                        // Если сервер вернул ошибку, пытаемся загрузить последнее кэшированное состояние
                         localDb.systemStateDao().getLatestState()?.let { cached ->
                             Result.success(cached.toSystemState())
                         } ?: Result.failure(Exception("Ошибка получения состояния: ${response.code()}"))
                     }
                 } catch (e: Exception) {
-                    // В случае ошибки сети возвращаем кэшированное состояние, если оно имеется
                     localDb.systemStateDao().getLatestState()?.let { cached ->
                         Result.success(cached.toSystemState())
                     } ?: Result.failure(e)
                 }
             } else {
-                // Оффлайн-режим: загружаем последнее кэшированное состояние
                 localDb.systemStateDao().getLatestState()?.let { cached ->
                     Result.success(cached.toSystemState())
                 } ?: Result.failure(Exception("Нет подключения к сети и отсутствуют кэшированные данные."))
@@ -122,7 +126,7 @@ class EventRepository(private val context: Context) {
         }
     }
 
-    // Функция проверки наличия подключения к сети
+    // Проверка наличия подключения к сети
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
