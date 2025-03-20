@@ -45,6 +45,8 @@ public class EventController {
             return mapper.map(event, TaskCompletedEventResponseDTO.class);
         } else if (event instanceof WorkerGroupCreationEvent) {
             return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
+        } else if (event instanceof WorkerPositionUpdateEvent) {
+            return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
         } else {
             throw new UnsupportedDtoException("Unsupported DTO");
         }
