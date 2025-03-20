@@ -51,7 +51,7 @@ class GeoMonitoringApiApplicationTests {
         LocationCreationEvent locationEvent = new LocationCreationEvent();
         locationEvent.setId(1L); // id используется как ключ для локации
         locationEvent.setName("Склад");
-        locationEvent.setPoints(Set.of(new Point(10.0, 20.0), new Point(10.1, 20.1)));
+        //locationEvent.setPoints(Set.of(new Point(10.0, 20.0), new Point(10.1, 20.1)));
         locationEvent.setTimestamp(Instant.now().minusSeconds(100));
         state = locationEvent.apply(state);
 

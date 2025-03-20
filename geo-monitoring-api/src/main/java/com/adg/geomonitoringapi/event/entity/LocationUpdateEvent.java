@@ -3,16 +3,14 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.event.Point;
 import com.adg.geomonitoringapi.state.LocationState;
 import com.adg.geomonitoringapi.state.SystemState;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,7 +23,8 @@ public class LocationUpdateEvent extends Event {
 
     @ElementCollection
     @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
-    private Set<Point> points;
+    @OrderColumn(name = "list_index")
+    private List<Point> points;
 
     @Override
     public SystemState apply(SystemState oldState) {

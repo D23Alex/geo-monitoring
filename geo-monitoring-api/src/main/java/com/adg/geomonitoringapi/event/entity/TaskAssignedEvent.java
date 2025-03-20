@@ -58,7 +58,10 @@ public class TaskAssignedEvent extends Event {
             );
         }
 
+        Long newTaskId = getId();
+
         TaskState newTask = TaskState.builder()
+                .id(newTaskId)
                 .assignedWorkers(assignedWorkers)
                 .locationId(locationId)
                 .completionCriteria(completionCriteriaStates)
@@ -67,8 +70,6 @@ public class TaskAssignedEvent extends Event {
                 .description(description)
                 .status(TaskStatus.CREATED)
                 .build();
-
-        Long newTaskId = getId();
 
         if (oldState.getTasks().containsKey(newTaskId))
             throw new SystemState.StateUpdateException("Невозможно создать задачу: задача с id "

@@ -3,6 +3,7 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.event.AbsenceReason;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.WorkAbsenceState;
+import com.adg.geomonitoringapi.util.Interval;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,9 +40,9 @@ public class WorkAbsenceRequestEvent extends Event {
         var newAbsences = new HashMap<>(oldState.getAbsences());
         newAbsences.put(newAbsenceId,
                 WorkAbsenceState.builder()
-                        .worker(oldState.getWorkers().get(workerId))
-                        .absenceRequestedTo(absenceTo)
-                        .absenceRequestedFrom(absenceFrom)
+                        .id(newAbsenceId)
+                        .workerId(workerId)
+                        .requestedInterval(new Interval(absenceFrom, absenceTo))
                         .absenceReason(absenceReason)
                         .reasonComment(reasonComment).build());
 

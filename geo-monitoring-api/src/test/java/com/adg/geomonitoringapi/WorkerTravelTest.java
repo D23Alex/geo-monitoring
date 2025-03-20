@@ -74,7 +74,7 @@ public class WorkerTravelTest {
 
         SystemState state = stateService.getLatestState();
 
-        assertEquals(new Point(60.4, 50.4), state.getWorkers().get(1L).lastKnownPosition());
+        assertEquals(new Point(60.4, 50.4), state.getWorkers().get(1L).lastKnownPosition().get());
 
         assertEquals(
                 Geometry.totalTravelDistance(List.of(

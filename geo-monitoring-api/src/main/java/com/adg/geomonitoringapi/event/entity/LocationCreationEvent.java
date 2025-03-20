@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,17 +25,20 @@ public class LocationCreationEvent extends Event {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "location_points", joinColumns = @JoinColumn(name = "location_id"))
-    private Set<Point> points;
+    @OrderColumn(name = "list_index")
+    private List<Point> points;
 
     @Override
     public SystemState apply(SystemState oldState) {
+        Long newLocationId = getId();
+
         LocationState newLocation = LocationState.builder()
                 .points(points)
                 .name(name)
+                .id(newLocationId)
                 .build();
 
-        Long newLocationId = getId();
+
 
         if (oldState.getLocations().containsKey(newLocationId))
             throw new SystemState.StateUpdateException("Невозможно создать локацию: локация с id "

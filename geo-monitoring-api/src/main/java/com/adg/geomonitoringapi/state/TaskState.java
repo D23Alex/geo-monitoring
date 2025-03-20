@@ -15,6 +15,7 @@ import java.util.Set;
 @Builder
 @With
 public class TaskState {
+    private Long id;
     private String description;
     private Set<Long> assignedWorkers = new HashSet<>();
     private TaskStatus status;
@@ -24,4 +25,12 @@ public class TaskState {
     private String closingReason;
     private Interval activeInterval;
     private Long locationId;
+
+    public boolean isInProgress() {
+        return status != TaskStatus.COMPLETED && status != TaskStatus.CANCELLED;
+    }
+
+    public boolean isActive(Instant t) {
+        return activeInterval.contains(t) && (isInProgress() || (closedAt != null && closedAt.isAfter(t)));
+    }
 }

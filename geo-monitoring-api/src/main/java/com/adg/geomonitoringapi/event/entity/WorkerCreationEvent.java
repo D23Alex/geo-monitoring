@@ -31,7 +31,7 @@ public class WorkerCreationEvent extends Event {
 
         var newWorkers = new HashMap<>(oldState.getWorkers());
         newWorkers.put(getId(),
-                WorkerState.builder().name(worker.getName()).build()
+                WorkerState.builder().name(worker.getName()).id(getId()).build()
         );
 
         return oldState.withWorkers(newWorkers);

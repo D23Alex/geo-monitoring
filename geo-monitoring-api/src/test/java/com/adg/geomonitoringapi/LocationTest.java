@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ public class LocationTest {
 
         LocationCreationEvent e = LocationCreationEvent.builder()
                 .name("somelocation")
-                .points(Set.of(
+                .points(List.of(
                         new Point(60.1, 50.1),
                         new Point(70.1, 70.1),
                         new Point(23.8, 5.9)

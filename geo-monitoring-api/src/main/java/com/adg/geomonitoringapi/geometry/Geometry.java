@@ -3,6 +3,7 @@ package com.adg.geomonitoringapi.geometry;
 import com.adg.geomonitoringapi.event.Point;
 
 import java.util.Collection;
+import java.util.List;
 
 public class Geometry {
     private static final double R = 6371.0; // Радиус Земли в километрах
@@ -38,5 +39,23 @@ public class Geometry {
             prevPoint = point;
         }
         return totalDistance;
+    }
+
+    public static boolean isPointInPolygon(Point point, List<Point> polygon) {
+        int n = polygon.size();
+        boolean inside = false;
+
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            Point vertex1 = polygon.get(i);
+            Point vertex2 = polygon.get(j);
+
+            if (((vertex1.getLatitude() > point.getLatitude()) != (vertex2.getLatitude() > point.getLatitude())) &&
+                    (point.getLongitude() < (vertex2.getLongitude() - vertex1.getLongitude())
+                            * (point.getLatitude() - vertex1.getLatitude())
+                            / (vertex2.getLatitude() - vertex1.getLatitude()) + vertex1.getLongitude())) {
+                inside = !inside;
+            }
+        }
+        return inside;
     }
 }

@@ -56,7 +56,7 @@ public class EventControllerTest {
         // Создаем объект LocationCreationEvent, который будет возвращен фабрикой
         LocationCreationEvent createdEvent = new LocationCreationEvent();
         createdEvent.setName("Location 1");
-        createdEvent.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Точки совпадают с переданными
+        //createdEvent.setPoints(Set.of(new Point(40.7128, -74.0060)));  // Точки совпадают с переданными
         createdEvent.setId(1L);  // Устанавливаем ID для теста
 
         // Настроим фабрику для реального создания события

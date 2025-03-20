@@ -27,14 +27,16 @@ public class WorkerGroupCreationEvent extends Event {
 
     @Override
     public SystemState apply(SystemState oldState) {
+        Long newGroupId = getId();
+
         GroupState newGroup = GroupState.builder()
+                .id(newGroupId)
                 .workerIds(workerIds)
                 .foremanId(foremanId)
                 .activeInterval(new Interval(groupActiveFrom, groupActiveTo))
                 .createdAt(getTimestamp())
                 .build();
 
-        Long newGroupId = getId();
         if (oldState.getTasks().containsKey(newGroupId))
             throw new SystemState.StateUpdateException("Невозможно создать группу: группа с id "
                     + newGroupId + " уже существует");
