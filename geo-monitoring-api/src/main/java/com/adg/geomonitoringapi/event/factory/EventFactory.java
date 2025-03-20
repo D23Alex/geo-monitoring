@@ -2,6 +2,7 @@ package com.adg.geomonitoringapi.event.factory;
 
 import com.adg.geomonitoringapi.event.dto.*;
 import com.adg.geomonitoringapi.event.entity.*;
+import com.adg.geomonitoringapi.exception.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,7 @@ public class EventFactory {
     public Event createEvent(EventCreationDTO eventCreationDTO) {
         Class<? extends Event> eventClass = eventMap.get(eventCreationDTO.getClass());
         if (eventClass == null) {
-            throw new IllegalArgumentException("Unsupported Event DTO type: " + eventCreationDTO.getClass().getName());
+            throw new EntityNotFoundException("Entity not found");
         }
         return modelMapper.map(eventCreationDTO, eventClass);
     }

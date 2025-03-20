@@ -93,15 +93,19 @@ public class EventControllerIntegrationTest {
         log.info("Response Content: {}", responseContent);
 
     }
-
     @Test
     public void testCreateEventUnsupportedDto() throws Exception {
+        // Создание неправильного DTO
         EventCreationDTO unsupportedDto = new EventCreationDTO() {};
 
         mockMvc.perform(post("/api/events")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Malformed JSON"))
+                .andExpect(jsonPath("$.message").value("Invalid or malformed JSON in the request body"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         MvcResult result = mockMvc.perform(post("/api/events")
                         .contentType("application/json")

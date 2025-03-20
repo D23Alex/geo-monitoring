@@ -4,6 +4,7 @@ import com.adg.geomonitoringapi.event.dto.*;
 import com.adg.geomonitoringapi.event.entity.*;
 import com.adg.geomonitoringapi.event.factory.EventFactory;
 import com.adg.geomonitoringapi.event.service.EventService;
+import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class EventController {
         } else if (event instanceof WorkerGroupCreationEvent) {
             return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
         } else {
-            throw new IllegalArgumentException("Unsupported Event type: " + event.getClass().getName());
+            throw new UnsupportedDtoException("Unsupported DTO");
         }
     }
 }
