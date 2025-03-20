@@ -16,7 +16,6 @@ public class WorkAbsenceState {
     Instant absenceRequestedTo;
     AbsenceReason absenceReason;
     String reasonComment;
-
     Instant absenceAllowedFrom;
     Instant absenceAllowedTo;
     boolean isAbsenceAllowed;
