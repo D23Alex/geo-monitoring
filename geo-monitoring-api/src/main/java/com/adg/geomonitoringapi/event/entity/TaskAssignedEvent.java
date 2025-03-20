@@ -2,10 +2,10 @@ package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.event.CompletionCriteria;
 import com.adg.geomonitoringapi.event.TaskStatus;
-import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.state.CompletionCriteriaState;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.TaskState;
+import com.adg.geomonitoringapi.util.Interval;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.Set;
 public class TaskAssignedEvent extends Event {
     private String description;
     @ElementCollection
-    private Set<Worker> assignedWorkers;
+    private Set<Long> assignedWorkers;
     @ElementCollection
     private List<CompletionCriteria> completionCriteria;
     private Long locationId;
@@ -41,6 +41,9 @@ public class TaskAssignedEvent extends Event {
         if (!oldState.getLocations().containsKey(locationId))
             throw new SystemState.StateUpdateException("Невозможно создать задачу: локация с id "
                     + locationId + " не существует");
+
+        if (!oldState.getWorkers().keySet().containsAll(assignedWorkers))
+            throw new SystemState.StateUpdateException("Невозможно создать задачу: работник не найден");
 
         Map<Integer, CompletionCriteriaState> completionCriteriaStates = new HashMap<>();
         for (int i = 0; i < completionCriteria.size(); i++) {
@@ -55,15 +58,18 @@ public class TaskAssignedEvent extends Event {
             );
         }
 
+        Long newTaskId = getId();
+
         TaskState newTask = TaskState.builder()
+                .id(newTaskId)
                 .assignedWorkers(assignedWorkers)
+                .locationId(locationId)
                 .completionCriteria(completionCriteriaStates)
                 .createdAt(getTimestamp())
+                .activeInterval(new Interval(activeFrom, activeTo))
                 .description(description)
                 .status(TaskStatus.CREATED)
                 .build();
-
-        Long newTaskId = getId();
 
         if (oldState.getTasks().containsKey(newTaskId))
             throw new SystemState.StateUpdateException("Невозможно создать задачу: задача с id "

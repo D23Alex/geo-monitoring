@@ -1,4 +1,4 @@
-package com.adg.geomonitoringapi;
+package com.adg.geomonitoringapi.util;
 
 import java.time.Instant;
 import java.util.ArrayList;

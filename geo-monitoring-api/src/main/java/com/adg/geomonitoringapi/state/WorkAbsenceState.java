@@ -1,6 +1,7 @@
 package com.adg.geomonitoringapi.state;
 
 import com.adg.geomonitoringapi.event.AbsenceReason;
+import com.adg.geomonitoringapi.util.Interval;
 import lombok.*;
 
 import java.time.Instant;
@@ -12,12 +13,13 @@ import java.time.Instant;
 @Builder
 @With
 public class WorkAbsenceState {
-    Instant absenceRequestedFrom;
-    Instant absenceRequestedTo;
+    private Long id;
+
+    Long workerId;
+    Interval requestedInterval;
     AbsenceReason absenceReason;
     String reasonComment;
-    Instant absenceAllowedFrom;
-    Instant absenceAllowedTo;
+    Interval allowedInterval;
     boolean isAbsenceAllowed;
     String verdictComment;
 }
