@@ -22,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -43,30 +45,45 @@ public class GroupsAndTasksTest {
     @Transactional
     public void testGroupCreation() {
         Instant initial = Instant.now();
-
-        Worker foreman = Worker.builder().name("foremanName").build();
-
-        Set<Worker> workers = Set.of(
+        List<Worker> workers = List.of(
                 Worker.builder().name("worker1").build(),
                 Worker.builder().name("worker2").build(),
                 Worker.builder().name("worker3").build()
         );
+        Worker foreman = Worker.builder().name("foremanName").build();
 
-        WorkerGroupCreationEvent e = WorkerGroupCreationEvent.builder()
-                .groupActiveTo(initial.minusSeconds(1000000))
-                .groupActiveFrom(initial.plusSeconds(1000000))
-                .timestamp(initial.plusSeconds(10))
-                .workers(workers)
-                .foreman(foreman).build();
+        List<Event> events = List.of(
+                WorkerCreationEvent.builder()
+                        .worker(workers.get(0))
+                        .timestamp(initial.plusSeconds(1)).build(),
+                WorkerCreationEvent.builder()
+                        .worker(workers.get(1))
+                        .timestamp(initial.plusSeconds(2)).build(),
+                WorkerCreationEvent.builder()
+                        .worker(workers.get(2))
+                        .timestamp(initial.plusSeconds(3)).build(),
+                WorkerCreationEvent.builder()
+                        .worker(foreman)
+                        .timestamp(initial.plusSeconds(4)).build(),
 
-        eventRepository.save(e);
+                WorkerGroupCreationEvent.builder()
+                        .groupActiveFrom(initial.minusSeconds(1000000))
+                        .groupActiveTo(initial.plusSeconds(1000000))
+                        .timestamp(initial.plusSeconds(10))
+                        .workerIds(Set.of(1L, 2L, 3L))
+                        .foremanId(4L).build()
+        );
+
+        eventRepository.saveAll(events);
 
         SystemState state = stateService.getLatestState();
+        GroupState group = state.getGroups().get(5L);
 
-        GroupState group = state.getGroups().get(1L);
-
-        assertEquals(foreman, group.getForeman());
-        group.getWorkers().forEach(worker -> System.out.println(worker.getName()));
-        assertEquals(workers, group.getWorkers());
+        assertEquals(foreman.getName(), state.getWorkers().get(group.getForemanId()).getName());
+        assertEquals(3, group.getWorkerIds().size());
+        group.getWorkerIds().forEach(workerId ->
+                assertTrue(workers.stream().map(Worker::getName).collect(Collectors.toSet())
+                        .contains(state.getWorkers().get(workerId).getName()))
+        );
     }
 }

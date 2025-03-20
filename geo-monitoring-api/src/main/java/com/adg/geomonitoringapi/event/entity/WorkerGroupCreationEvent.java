@@ -1,9 +1,8 @@
 package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.state.GroupState;
-import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.state.SystemState;
-import com.adg.geomonitoringapi.state.WorkerState;
+import com.adg.geomonitoringapi.util.Interval;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -11,7 +10,6 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 import java.util.Hashtable;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -32,8 +30,7 @@ public class WorkerGroupCreationEvent extends Event {
         GroupState newGroup = GroupState.builder()
                 .workerIds(workerIds)
                 .foremanId(foremanId)
-                .activeFrom(groupActiveFrom)
-                .activeTo(groupActiveTo)
+                .activeInterval(new Interval(groupActiveFrom, groupActiveTo))
                 .createdAt(getTimestamp())
                 .build();
 

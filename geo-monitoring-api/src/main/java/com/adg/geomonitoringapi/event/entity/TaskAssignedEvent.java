@@ -2,10 +2,10 @@ package com.adg.geomonitoringapi.event.entity;
 
 import com.adg.geomonitoringapi.event.CompletionCriteria;
 import com.adg.geomonitoringapi.event.TaskStatus;
-import com.adg.geomonitoringapi.event.Worker;
 import com.adg.geomonitoringapi.state.CompletionCriteriaState;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.TaskState;
+import com.adg.geomonitoringapi.util.Interval;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -60,8 +60,10 @@ public class TaskAssignedEvent extends Event {
 
         TaskState newTask = TaskState.builder()
                 .assignedWorkers(assignedWorkers)
+                .locationId(locationId)
                 .completionCriteria(completionCriteriaStates)
                 .createdAt(getTimestamp())
+                .activeInterval(new Interval(activeFrom, activeTo))
                 .description(description)
                 .status(TaskStatus.CREATED)
                 .build();
