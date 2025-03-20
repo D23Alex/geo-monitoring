@@ -16,8 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -26,6 +24,7 @@ import java.time.Instant;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -56,22 +55,24 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
-    @Transactional
     public void testCreateLocationCreationEventSuccess() throws Exception {
         LocationCreationEventCreationDTO eventCreationDTO = new LocationCreationEventCreationDTO();
         eventCreationDTO.setName("Location 1");
         eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060)));
         eventCreationDTO.setTimestamp(Instant.now());
 
-        MvcResult result = mockMvc.perform(post("/api/events")
+        mockMvc.perform(post("/api/events")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andExpect(status().isCreated())
-                .andReturn();
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Location 1"))
+                .andExpect(jsonPath("$.points[0].latitude").value(40.7128))
+                .andExpect(jsonPath("$.points[0].longitude").value(-74.006))
+                .andExpect(jsonPath("$.points").isArray())
+                .andExpect(jsonPath("$.timestamp").exists());
 
 
-        String responseBody = result.getResponse().getContentAsString();
-        System.out.println("Ответ !!!!!!! " + responseBody);
     }
 
     @Test

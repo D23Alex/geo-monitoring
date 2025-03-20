@@ -18,52 +18,34 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/api/events")
 public class EventController {
+
     private final EventService eventService;
     private final EventFactory eventFactory;
     private final ModelMapper mapper = new ModelMapper();
 
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody EventCreationDTO eventCreationDTO) {
-        try {
-            EventResponseDTO eventResponseDTO;
+        Event event = eventFactory.createEvent(eventCreationDTO);
+        Event createdEvent = eventService.submitEvent(event);
+        EventResponseDTO eventResponseDTO = mapEventToResponseDTO(createdEvent);
+        return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
+    }
 
-            if (eventCreationDTO instanceof LocationCreationEventCreationDTO) {
-                LocationCreationEvent event = (LocationCreationEvent) eventFactory.createEvent(eventCreationDTO);
-                LocationCreationEvent createdEvent = (LocationCreationEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, LocationCreationEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else if (eventCreationDTO instanceof AbnormalSituationEventCreationDTO) {
-                AbnormalSituationEvent event = (AbnormalSituationEvent) eventFactory.createEvent(eventCreationDTO);
-                AbnormalSituationEvent createdEvent = (AbnormalSituationEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, AbnormalSituationEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else if (eventCreationDTO instanceof TaskAssignedEventCreationDTO) {
-                TaskAssignedEvent event = (TaskAssignedEvent) eventFactory.createEvent(eventCreationDTO);
-                TaskAssignedEvent createdEvent = (TaskAssignedEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, TaskAssignedEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else if (eventCreationDTO instanceof TaskCancelledEventCreationDTO) {
-                TaskCancelledEvent event = (TaskCancelledEvent) eventFactory.createEvent(eventCreationDTO);
-                TaskCancelledEvent createdEvent = (TaskCancelledEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, TaskCancelledEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else if (eventCreationDTO instanceof TaskCompletedEventCreationDTO) {
-                TaskCompletedEvent event = (TaskCompletedEvent) eventFactory.createEvent(eventCreationDTO);
-                TaskCompletedEvent createdEvent = (TaskCompletedEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, TaskCompletedEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else if (eventCreationDTO instanceof WorkerGroupCreationEventCreationDTO) {
-                WorkerGroupCreationEvent event = (WorkerGroupCreationEvent) eventFactory.createEvent(eventCreationDTO);
-                WorkerGroupCreationEvent createdEvent = (WorkerGroupCreationEvent) eventService.submitEvent(event);
-                eventResponseDTO = mapper.map(createdEvent, WorkerGroupCreationEventResponseDTO.class);
-                return ResponseEntity.created(URI.create("/api/events/" + createdEvent.getId())).body(eventResponseDTO);
-            } else {
-                throw new IllegalArgumentException("Unsupported Event DTO type: " + eventCreationDTO.getClass().getName());
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка при создании события!");
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+    private EventResponseDTO mapEventToResponseDTO(Event event) {
+        if (event instanceof LocationCreationEvent) {
+            return mapper.map(event, LocationCreationEventResponseDTO.class);
+        } else if (event instanceof AbnormalSituationEvent) {
+            return mapper.map(event, AbnormalSituationEventResponseDTO.class);
+        } else if (event instanceof TaskAssignedEvent) {
+            return mapper.map(event, TaskAssignedEventResponseDTO.class);
+        } else if (event instanceof TaskCancelledEvent) {
+            return mapper.map(event, TaskCancelledEventResponseDTO.class);
+        } else if (event instanceof TaskCompletedEvent) {
+            return mapper.map(event, TaskCompletedEventResponseDTO.class);
+        } else if (event instanceof WorkerGroupCreationEvent) {
+            return mapper.map(event, WorkerGroupCreationEventResponseDTO.class);
+        } else {
+            throw new IllegalArgumentException("Unsupported Event type: " + event.getClass().getName());
         }
     }
 }
