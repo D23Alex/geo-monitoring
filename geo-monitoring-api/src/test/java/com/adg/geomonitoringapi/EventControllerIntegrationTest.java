@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class})
 public class EventControllerIntegrationTest {
 
-    // Запуск контейнера PostgreSQL через Testcontainers
     @Container
     public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:15")
             .withDatabaseName("postgres")
@@ -61,8 +60,8 @@ public class EventControllerIntegrationTest {
     public void testCreateLocationCreationEventSuccess() throws Exception {
         LocationCreationEventCreationDTO eventCreationDTO = new LocationCreationEventCreationDTO();
         eventCreationDTO.setName("Location 1");
-        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060))); // Пример координат
-        eventCreationDTO.setTimestamp(Instant.now()); // или новое значение для timestamp
+        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060)));
+        eventCreationDTO.setTimestamp(Instant.now());
 
         MvcResult result = mockMvc.perform(post("/api/events")
                         .contentType("application/json")
@@ -72,7 +71,7 @@ public class EventControllerIntegrationTest {
 
 
         String responseBody = result.getResponse().getContentAsString();
-        System.out.println("Дебил !!!!!!! " + responseBody);
+        System.out.println("Ответ !!!!!!! " + responseBody);
     }
 
     @Test

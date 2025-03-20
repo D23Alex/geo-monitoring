@@ -37,11 +37,9 @@ public abstract class Event {
     private Long id;
     private Instant timestamp;
 
-    // Метод, который действительно поочередно вызывается на последовательности ивентов для получения стейта
     public SystemState updateState(SystemState oldState) {
         return apply(oldState).withLastEvent(this).withEventsApplied(oldState.getEventsApplied() + 1);
     }
 
-    // Метод, который нужно переопределять
     public abstract SystemState apply(SystemState oldState);
 }
