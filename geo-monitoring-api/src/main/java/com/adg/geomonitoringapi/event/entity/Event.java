@@ -37,6 +37,11 @@ public abstract class Event {
     private Long id;
     private Instant timestamp;
 
+    @PreUpdate
+    private void validateImmutability() {
+        throw new UnsupportedOperationException("Ивенты нельзя изменять.");
+    }
+
     public SystemState updateState(SystemState oldState) {
         return apply(oldState).withLastEvent(this).withEventsApplied(oldState.getEventsApplied() + 1);
     }

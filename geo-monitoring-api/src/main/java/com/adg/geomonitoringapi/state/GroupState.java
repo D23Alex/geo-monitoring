@@ -14,6 +14,7 @@ import java.util.Set;
 @With
 public final class GroupState {
     private Long id;
+    private String name;
     private Set<Long> workerIds;
     private Long foremanId;
     private Instant createdAt;

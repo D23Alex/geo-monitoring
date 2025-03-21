@@ -34,4 +34,12 @@ public class TaskState {
     public boolean isActive(Instant t) {
         return activeInterval.contains(t) && (isInProgress() || (closedAt != null && closedAt.isAfter(t)));
     }
+
+    public boolean isExpired(Instant t) {
+        return activeInterval.endsBefore(t);
+    }
+
+    public boolean isUpcoming(Instant t) {
+        return activeInterval.startsAfter(t);
+    }
 }
