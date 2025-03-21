@@ -1,8 +1,8 @@
 package com.adg.geomonitoringapi.event.factory;
 
-import com.adg.geomonitoringapi.event.dto.*;
+import com.adg.geomonitoringapi.event.dto.EventCreationDTO;
 import com.adg.geomonitoringapi.event.entity.*;
-import com.adg.geomonitoringapi.exception.EntityNotFoundException;
+import com.adg.geomonitoringapi.exception.UnsupportedEventType;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -14,21 +14,27 @@ public class EventFactory {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
-    private static final Map<Class<? extends EventCreationDTO>, Class<? extends Event>> eventMap = new HashMap<>();
+    private static final Map<String, Class<? extends Event>> eventMap = new HashMap<>();
 
     static {
-        eventMap.put(LocationCreationEventCreationDTO.class, LocationCreationEvent.class);
-        eventMap.put(AbnormalSituationEventCreationDTO.class, AbnormalSituationEvent.class);
-        eventMap.put(TaskAssignedEventCreationDTO.class, TaskAssignedEvent.class);
-        eventMap.put(TaskCancelledEventCreationDTO.class, TaskCancelledEvent.class);
-        eventMap.put(TaskCompletedEventCreationDTO.class, TaskCompletedEvent.class);
-        eventMap.put(WorkerGroupCreationEventCreationDTO.class, WorkerGroupCreationEvent.class);
+        eventMap.put("location-creations", LocationCreationEvent.class);
+        eventMap.put("abnormal-situations", AbnormalSituationEvent.class);
+        eventMap.put("task-assignments", TaskAssignedEvent.class);
+        eventMap.put("task-cancellations", TaskCancelledEvent.class);
+        eventMap.put("task-completions", TaskCompletedEvent.class);
+        eventMap.put("worker-group-creations", WorkerGroupCreationEvent.class);
     }
 
-    public Event createEvent(EventCreationDTO eventCreationDTO) {
-        Class<? extends Event> eventClass = eventMap.get(eventCreationDTO.getClass());
+    /**
+     * Создает событие по типу eventType.
+     * @param eventType Тип события.
+     * @param eventCreationDTO Данные для создания события.
+     * @return Созданное событие.
+     */
+    public Event createEvent(String eventType, EventCreationDTO eventCreationDTO) {
+        Class<? extends Event> eventClass = eventMap.get(eventType.toLowerCase());
         if (eventClass == null) {
-            throw new EntityNotFoundException("Entity not found");
+            throw new UnsupportedEventType("Event type is not supported");
         }
         return modelMapper.map(eventCreationDTO, eventClass);
     }
