@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [UnsentEvent::class, CachedSystemState::class], version = 1)
+@Database(entities = [UnsentEvent::class, CachedSystemState::class], version = 1, exportSchema = false)
 abstract class LocalEventDatabase : RoomDatabase() {
     abstract fun eventDao(): EventDao
     abstract fun systemStateDao(): SystemStateDao
@@ -20,12 +20,12 @@ abstract class LocalEventDatabase : RoomDatabase() {
                     context.applicationContext,
                     LocalEventDatabase::class.java,
                     "local_events.db"
-                )
-                    // При необходимости добавить миграции и/или шифрование
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }
         }
     }
 }
+
+
