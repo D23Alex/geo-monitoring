@@ -1,10 +1,9 @@
 package com.adg.geomonitoringapi.util;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Util {
     public static final Instant SOME_TIMESTAMP_IN_FUTURE = Instant.ofEpochSecond(31556889864L);
@@ -22,5 +21,12 @@ public class Util {
         for (T e = queue.poll(); e != null; e = queue.poll())
             elements.add(e);
         return elements;
+    }
+
+    public static <T, R> Set<R> construct(Map<Supplier<Boolean>, R> candidates) {
+        return candidates.entrySet().stream()
+                .filter(e -> e.getKey().get())
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
     }
 }

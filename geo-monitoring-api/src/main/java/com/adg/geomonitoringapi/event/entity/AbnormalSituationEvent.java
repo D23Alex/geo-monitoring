@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.util.Set;
+
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Getter
@@ -16,6 +18,11 @@ import lombok.*;
 public class AbnormalSituationEvent extends Event {
     private Worker worker;
     private String description; // описание внештатной ситуации
+
+    @Override
+    public Set<String> oldStateIssues(SystemState oldState) {
+        return Set.of();
+    }
 
     @Override
     public SystemState apply(SystemState oldState) {
