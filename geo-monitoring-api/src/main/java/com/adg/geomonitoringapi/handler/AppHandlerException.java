@@ -1,7 +1,9 @@
 package com.adg.geomonitoringapi.handler;
 
+import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.exception.EntityNotFoundException;
 import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
+import com.adg.geomonitoringapi.exception.UnsupportedEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,13 @@ public class AppHandlerException {
         log.error("Failed to read the HTTP message: {}", ex.getMessage());
         String errorMessage = "Invalid or malformed JSON in the request body";
         return buildResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON", errorMessage);
+    }
+
+    @ExceptionHandler(UnsupportedEventType.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadableException(UnsupportedEventType ex) {
+        log.error("Failed to read the HTTP message: {}", ex.getMessage());
+        String errorMessage = "Event type is not exists";
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, "Unsupported event type: invalidEventType", errorMessage);
     }
 
     private ResponseEntity<Map<String, Object>> buildResponseEntity(HttpStatus status, String error, String message) {

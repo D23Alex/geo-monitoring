@@ -70,7 +70,7 @@ public class EventControllerTest {
                 new Point(30.1235, 59.3432)));
         eventCreationDTO.setTimestamp(Instant.now());
 
-        mockMvc.perform(post("/api/events")
+        mockMvc.perform(post("/api/events/locationcreation")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andExpect(status().isCreated())
@@ -83,7 +83,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.points").isArray())
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        MvcResult result = mockMvc.perform(post("/api/events")
+        MvcResult result = mockMvc.perform(post("/api/events/locationcreation")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andReturn();
@@ -91,14 +91,13 @@ public class EventControllerTest {
         String responseContent = result.getResponse().getContentAsString();
 
         log.info("Response Content: {}", responseContent);
-
     }
+
     @Test
     public void testCreateEventUnsupportedDto() throws Exception {
-        // Создание неправильного DTO
         EventCreationDTO unsupportedDto = new EventCreationDTO() {};
 
-        mockMvc.perform(post("/api/events")
+        mockMvc.perform(post("/api/events/locationcreation")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
                 .andExpect(status().isBadRequest())
@@ -107,7 +106,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message").value("Invalid or malformed JSON in the request body"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        MvcResult result = mockMvc.perform(post("/api/events")
+        MvcResult result = mockMvc.perform(post("/api/events/locationcreation")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
                 .andReturn();
@@ -115,5 +114,23 @@ public class EventControllerTest {
         String responseContent = result.getResponse().getContentAsString();
 
         log.info("Response Content: {}", responseContent);
+    }
+
+    @Test
+    public void testCreateEventUnsupportedEventType() throws Exception {
+        LocationCreationEventCreationDTO eventCreationDTO = new LocationCreationEventCreationDTO();
+        eventCreationDTO.setName("Location 1");
+        eventCreationDTO.setPoints(Set.of(new Point(40.7128, -74.0060),
+                new Point(30.1235, 59.3432)));
+        eventCreationDTO.setTimestamp(Instant.now());
+
+        mockMvc.perform(post("/api/events/invalidEventType")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(eventCreationDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Unsupported event type: invalidEventType"))
+                .andExpect(jsonPath("$.message").value("Event type is not exists"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 }
