@@ -8,24 +8,14 @@ import java.util.List;
 public class Geometry {
     private static final double R = 6371.0; // Радиус Земли в километрах
 
-    public static Double haversine(Double lat1, Double lon1, Double lat2, Double lon2) {
-        double lat1Rad = Math.toRadians(lat1);
-        double lon1Rad = Math.toRadians(lon1);
-        double lat2Rad = Math.toRadians(lat2);
-        double lon2Rad = Math.toRadians(lon2);
-
-        double dlat = lat2Rad - lat1Rad;
-        double dlon = lon2Rad - lon1Rad;
-
-        double a = Math.pow(Math.sin(dlat / 2), 2)
-                + Math.cos(lat1Rad) * Math.cos(lat2Rad) * Math.pow(Math.sin(dlon / 2), 2);
+    public static double haversine(Point p1, Point p2) {
+        double dLat = Math.toRadians(p2.getLatitude() - p1.getLatitude());
+        double dLon = Math.toRadians(p2.getLongitude() - p1.getLongitude());
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(p1.getLatitude())) * Math.cos(Math.toRadians(p2.getLatitude())) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
         return R * c;
-    }
-
-    public static Double haversine(Point p1, Point p2) {
-        return haversine(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude());
     }
 
     public static Double totalTravelDistance(Collection<Point> travelHistory) {
@@ -57,5 +47,41 @@ public class Geometry {
             }
         }
         return inside;
+    }
+
+    public static boolean isPointWithinDistanceFromPolygon(Point point, List<Point> polygon, double distance) {
+        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
+            Point vertex1 = polygon.get(i);
+            Point vertex2 = polygon.get(j);
+
+            if (distanceToSegment(point, vertex1, vertex2) <= distance) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isPointInOrNearPolygon(Point point, List<Point> polygon, double distance) {
+        if (isPointInPolygon(point, polygon))
+            return true;
+
+        return isPointWithinDistanceFromPolygon(point, polygon, distance);
+    }
+
+    public static double distanceToSegment(Point p, Point v, Point w) {
+        double d1 = haversine(p, v);
+        double d2 = haversine(p, w);
+        double d3 = haversine(v, w);
+
+        if (d3 == 0.0) return d1;
+        if (d1 == 0.0 || d2 == 0.0) return 0.0;
+
+        double angle1 = Math.acos((d1 * d1 + d3 * d3 - d2 * d2) / (2 * d1 * d3));
+        double angle2 = Math.acos((d2 * d2 + d3 * d3 - d1 * d1) / (2 * d2 * d3));
+
+        if (angle1 > Math.PI / 2) return d1;
+        if (angle2 > Math.PI / 2) return d2;
+
+        return Math.sin(angle1) * d1;
     }
 }
