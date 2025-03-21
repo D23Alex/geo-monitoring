@@ -1,36 +1,30 @@
-package com.adg.geomonitoringapi.state;
+package com.adg.geomonitoringapi.state.dto;
 
 import com.adg.geomonitoringapi.event.TaskStatus;
+import com.adg.geomonitoringapi.state.CompletionCriteriaState;
 import com.adg.geomonitoringapi.util.Interval;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.With;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @With
-public class TaskState {
+public class TaskDTO {
     private Long id;
     private String description;
-    private Set<Long> assignedWorkers = new HashSet<>();
+    private Set<Long> assignedWorkers;
     private TaskStatus status;
     private Map<Integer, CompletionCriteriaState> completionCriteria;
     private Instant createdAt;
     private Instant closedAt;
     private String closingReason;
     private Interval activeInterval;
-    private Long locationId;
-
-    public boolean isInProgress() {
-        return status != TaskStatus.COMPLETED && status != TaskStatus.CANCELLED;
-    }
-
-    public boolean isActive(Instant t) {
-        return activeInterval.contains(t) && (isInProgress() || (closedAt != null && closedAt.isAfter(t)));
-    }
+    private LocationDTO locationDTO;
 }
