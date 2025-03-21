@@ -70,7 +70,7 @@ public class EventControllerTest {
                 new Point(30.1235, 59.3432)));
         eventCreationDTO.setTimestamp(Instant.now());
 
-        mockMvc.perform(post("/api/events/locationcreation")
+        mockMvc.perform(post("/api/events/location-creations")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andExpect(status().isCreated())
@@ -83,7 +83,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.points").isArray())
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        MvcResult result = mockMvc.perform(post("/api/events/locationcreation")
+        MvcResult result = mockMvc.perform(post("/api/events/location-creations")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andReturn();
@@ -97,7 +97,7 @@ public class EventControllerTest {
     public void testCreateEventUnsupportedDto() throws Exception {
         EventCreationDTO unsupportedDto = new EventCreationDTO() {};
 
-        mockMvc.perform(post("/api/events/locationcreation")
+        mockMvc.perform(post("/api/events/location-creations")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
                 .andExpect(status().isBadRequest())
@@ -106,7 +106,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.message").value("Invalid or malformed JSON in the request body"))
                 .andExpect(jsonPath("$.timestamp").exists());
 
-        MvcResult result = mockMvc.perform(post("/api/events/locationcreation")
+        MvcResult result = mockMvc.perform(post("/api/events/location-creations")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(unsupportedDto)))
                 .andReturn();
@@ -124,7 +124,7 @@ public class EventControllerTest {
                 new Point(30.1235, 59.3432)));
         eventCreationDTO.setTimestamp(Instant.now());
 
-        mockMvc.perform(post("/api/events/invalidEventType")
+        mockMvc.perform(post("/api/events/invalid-event-types")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(eventCreationDTO)))
                 .andExpect(status().isBadRequest())

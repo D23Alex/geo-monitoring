@@ -19,17 +19,17 @@ public class EventMapper {
 
     @NotNull
     public static Class<? extends Event> getaClass(String eventType) {
-        return switch (eventType.toLowerCase()) {
-            case "locationcreation" -> LocationCreationEvent.class;
-            case "abnormalsituation" -> AbnormalSituationEvent.class;
-            case "taskassigned" -> TaskAssignedEvent.class;
-            case "taskcancelled" -> TaskCancelledEvent.class;
-            case "taskcompleted" -> TaskCompletedEvent.class;
-            case "workergroupcreation" -> WorkerGroupCreationEvent.class;
-            case "workerpositionupdate" -> WorkerPositionUpdateEvent.class;
-            case "criteriacompleted" -> CriteriaCompletedEvent.class;
-            default -> throw new UnsupportedEventType("Event type is not exists");
-        };
+        switch (eventType.toLowerCase()) {
+            case "location-creations": return LocationCreationEvent.class;
+            case "abnormal-situations": return AbnormalSituationEvent.class;
+            case "task-assignments": return TaskAssignedEvent.class;
+            case "task-cancellations": return TaskCancelledEvent.class;
+            case "task-completions": return TaskCompletedEvent.class;
+            case "worker-group-creations": return WorkerGroupCreationEvent.class;
+            case "worker-position-updates": return WorkerPositionUpdateEvent.class;
+            case "criteria-completions": return CriteriaCompletedEvent.class;
+            default: throw new UnsupportedEventType("Event type is not exists");
+        }
     }
 
     public EventResponseDTO mapEventToResponseDTO(Event event) {
@@ -37,18 +37,24 @@ public class EventMapper {
     }
 
     public static EventResponseDTO getEventResponseDTO(Event event, ModelMapper modelMapper) {
-        Class<? extends EventResponseDTO> responseDTOClass = switch (event.getClass().getSimpleName()) {
-            case "LocationCreationEvent" -> LocationCreationEventResponseDTO.class;
-            case "AbnormalSituationEvent" -> AbnormalSituationEventResponseDTO.class;
-            case "TaskAssignedEvent" -> TaskAssignedEventResponseDTO.class;
-            case "TaskCancelledEvent" -> TaskCancelledEventResponseDTO.class;
-            case "TaskCompletedEvent" -> TaskCompletedEventResponseDTO.class;
-            case "WorkerGroupCreationEvent" -> WorkerGroupCreationEventResponseDTO.class;
-            case "WorkerPositionUpdateEvent" -> WorkerPositionUpdateEventResponseDTO.class;
-            case "CriteriaCompletedEvent" -> CriteriaCompletedEventResponseDTO.class;
-            default -> throw new UnsupportedDtoException("Event type is not exists");
-        };
-
-        return modelMapper.map(event, responseDTOClass);
+        if (event instanceof LocationCreationEvent) {
+            return modelMapper.map(event, LocationCreationEventResponseDTO.class);
+        } else if (event instanceof AbnormalSituationEvent) {
+            return modelMapper.map(event, AbnormalSituationEventResponseDTO.class);
+        } else if (event instanceof TaskAssignedEvent) {
+            return modelMapper.map(event, TaskAssignedEventResponseDTO.class);
+        } else if (event instanceof TaskCancelledEvent) {
+            return modelMapper.map(event, TaskCancelledEventResponseDTO.class);
+        } else if (event instanceof TaskCompletedEvent) {
+            return modelMapper.map(event, TaskCompletedEventResponseDTO.class);
+        } else if (event instanceof WorkerGroupCreationEvent) {
+            return modelMapper.map(event, WorkerGroupCreationEventResponseDTO.class);
+        } else if (event instanceof WorkerPositionUpdateEvent) {
+            return modelMapper.map(event, WorkerPositionUpdateEventResponseDTO.class);
+        } else if (event instanceof CriteriaCompletedEvent) {
+            return modelMapper.map(event, CriteriaCompletedEventResponseDTO.class);
+        } else {
+            throw new UnsupportedDtoException("Event type is not exists");
+        }
     }
 }
