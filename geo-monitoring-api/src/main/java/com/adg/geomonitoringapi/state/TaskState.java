@@ -25,7 +25,6 @@ public class TaskState {
     private String closingReason;
     private Interval activeInterval;
     private Long locationId;
-    private LocationState locationStateDTO = SystemState.initial().getLocations().get(locationId);
 
     public boolean isInProgress() {
         return status != TaskStatus.COMPLETED && status != TaskStatus.CANCELLED;

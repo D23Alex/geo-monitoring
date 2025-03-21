@@ -37,7 +37,6 @@ public final class SystemState {
     public Set<Long> activeTaskIds(Instant t) {
         return activeTasks(t).stream().map(TaskState::getId).collect(Collectors.toSet());
     }
-
     /**
      * Узнать задачи, которые должны начать и закончить выполняться за определенный период
      * @param interval заданный интервал
