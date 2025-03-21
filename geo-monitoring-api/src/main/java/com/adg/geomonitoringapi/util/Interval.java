@@ -41,4 +41,12 @@ public class Interval {
     public long toDurationInSeconds() {
         return java.time.Duration.between(start, end).getSeconds();
     }
+
+    public boolean startsAfter(Instant t) {
+        return start.isAfter(t);
+    }
+
+    public boolean endsBefore(Instant t) {
+        return end.isBefore(t);
+    }
 }
