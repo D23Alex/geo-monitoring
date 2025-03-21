@@ -1,6 +1,5 @@
 package com.adg.geomonitoringapi.handler;
 
-import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.exception.EntityNotFoundException;
 import com.adg.geomonitoringapi.exception.UnsupportedDtoException;
 import com.adg.geomonitoringapi.exception.UnsupportedEventType;
