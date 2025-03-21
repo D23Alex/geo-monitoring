@@ -5,11 +5,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.example.mobile_app.local.LocalEventDatabase
 import com.example.mobile_app.local.UnsentEvent
-import com.example.mobile_app.local.toSystemState
 import com.example.mobile_app.model.Event
 import com.example.mobile_app.model.EventResponse
-import com.example.mobile_app.model.SystemState
-import com.example.mobile_app.model.toCachedState
 import com.example.mobile_app.network.ApiClient
 import com.example.mobile_app.security.SecurityUtil
 import com.google.gson.Gson
@@ -97,34 +94,6 @@ class EventRepository(private val context: Context) {
         val cutoff = sdf.format(Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000))
         eventDao.deleteEventsOlderThan(cutoff)
         // Дополнительно можно сохранять текущее состояние в отдельной таблице
-    }
-
-    // Получение текущего состояния системы с использованием оффлайн-кеша
-    suspend fun getCurrentState(): Result<SystemState> {
-        return withContext(Dispatchers.IO) {
-            if (isNetworkAvailable()) {
-                try {
-                    val response = apiService.getCurrentState()
-                    if (response.isSuccessful) {
-                        val state = response.body()!!
-                        localDb.systemStateDao().insertState(state.toCachedState())
-                        Result.success(state)
-                    } else {
-                        localDb.systemStateDao().getLatestState()?.let { cached ->
-                            Result.success(cached.toSystemState())
-                        } ?: Result.failure(Exception("Ошибка получения состояния: ${response.code()}"))
-                    }
-                } catch (e: Exception) {
-                    localDb.systemStateDao().getLatestState()?.let { cached ->
-                        Result.success(cached.toSystemState())
-                    } ?: Result.failure(e)
-                }
-            } else {
-                localDb.systemStateDao().getLatestState()?.let { cached ->
-                    Result.success(cached.toSystemState())
-                } ?: Result.failure(Exception("Нет подключения к сети и отсутствуют кэшированные данные."))
-            }
-        }
     }
 
     // Проверка наличия подключения к сети

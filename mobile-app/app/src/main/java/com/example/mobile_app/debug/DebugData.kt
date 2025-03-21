@@ -3,21 +3,10 @@ package com.example.mobile_app.debug
 import com.example.mobile_app.model.ActiveInterval
 import com.example.mobile_app.model.CompletionCriterion
 import com.example.mobile_app.model.SiteObjectWithTasks
-import com.example.mobile_app.model.SystemState
 import com.example.mobile_app.model.TaskDetails
 import com.example.mobile_app.model.TaskItem
-import com.example.mobile_app.model.WorkerPositionUpdateEvent
 
 object DebugData {
-    val dummySystemState: SystemState = SystemState(
-        lastEvent = WorkerPositionUpdateEvent(
-            workerId = 0,
-            latitude = 0.0,
-            longitude = 0.0,
-            timestamp = "2025-03-20T09:00:00Z"
-        )
-    )
-
     val dummySiteObject = SiteObjectWithTasks(
         id = 1001,
         name = "Объект А",

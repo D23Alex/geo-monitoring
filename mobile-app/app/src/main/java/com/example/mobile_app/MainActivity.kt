@@ -372,33 +372,33 @@ fun MainApp(
     startDestination: String,
     mainViewModel: MainViewModel = viewModel()
 ) {
-    // Загружаем состояние системы при первом запуске
-    LaunchedEffect(Unit) {
-        mainViewModel.loadSystemState()
-    }
-
-    // Собираем состояние системы
-    val systemState by mainViewModel.systemState.collectAsState()
-
-    // Если данные ещё не загружены, показываем индикатор загрузки с кнопкой «Повторить»
-    if (systemState == null) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Загрузка данных...")
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { mainViewModel.loadSystemState() }) {
-                Text("Повторить")
-            }
-        }
-        return
-    }
+//    // Загружаем состояние системы при первом запуске
+//    LaunchedEffect(Unit) {
+//        mainViewModel.loadSystemState()
+//    }
+//
+//    // Собираем состояние системы
+//    val systemState by mainViewModel.systemState.collectAsState()
+//
+//    // Если данные ещё не загружены, показываем индикатор загрузки с кнопкой «Повторить»
+//    if (systemState == null) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            CircularProgressIndicator()
+//            Spacer(modifier = Modifier.height(16.dp))
+//            Text("Загрузка данных...")
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Button(onClick = { mainViewModel.loadSystemState() }) {
+//                Text("Повторить")
+//            }
+//        }
+//        return
+//    }
 
     val context = LocalContext.current
     // Проверяем состояние авторизации через SharedPreferences
