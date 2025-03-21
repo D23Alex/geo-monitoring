@@ -1,24 +1,42 @@
 package com.example.mobile_app
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.mobile_app.location.LocationService
+import com.example.mobile_app.ui.DrawerContent
+import com.example.mobile_app.ui.navigation.AppNavHost
 import com.example.mobile_app.ui.theme.MobileAppTheme
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.single.PermissionListener
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
+import kotlinx.coroutines.launch
+import kotlin.collections.contains
 
 class MainActivity : ComponentActivity() {
 
@@ -36,7 +54,9 @@ class MainActivity : ComponentActivity() {
     private val fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
     // FOREGROUND_SERVICE_LOCATION отсутствует в Manifest.permission, поэтому задаём вручную:
     private val foregroundServiceLocationPermission = "android.permission.FOREGROUND_SERVICE_LOCATION"
+    @RequiresApi(Build.VERSION_CODES.Q)
     private val backgroundLocationPermission = Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    @RequiresApi(Build.VERSION_CODES.P)
     private val foregroundServicePermission = Manifest.permission.FOREGROUND_SERVICE
     private val internetPermission = Manifest.permission.INTERNET
 
@@ -45,7 +65,7 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onCreate вызван")
 
         // Инициализация SharedPreferences с дефолтными значениями
-        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         if (!prefs.contains(KEY_USERNAME)) {
             prefs.edit().apply {
                 putString(KEY_USERNAME, "login")
@@ -109,7 +129,7 @@ class MainActivity : ComponentActivity() {
                     onNegative = { showPermissionDeniedDialog() }
                 )
             }
-            !hasForegroundServicePermission() -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && !hasForegroundServicePermission() -> {
                 showPermissionRequestDialog(
                     title = "Требуется разрешение на foreground-сервис",
                     message = "Для корректной работы приложения необходимо разрешить запуск foreground-сервиса.",
@@ -145,6 +165,7 @@ class MainActivity : ComponentActivity() {
         } else true
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun hasForegroundServicePermission(): Boolean =
         ContextCompat.checkSelfPermission(this, foregroundServicePermission) == PackageManager.PERMISSION_GRANTED
 
@@ -240,6 +261,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Запрос разрешения ACCESS_BACKGROUND_LOCATION
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun requestBackgroundLocationPermission() {
         Dexter.withContext(this)
             .withPermission(backgroundLocationPermission)
@@ -262,6 +284,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Запрос разрешения FOREGROUND_SERVICE
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun requestForegroundServicePermission() {
         Dexter.withContext(this)
             .withPermission(foregroundServicePermission)
@@ -332,5 +355,63 @@ class MainActivity : ComponentActivity() {
             }
             .setCancelable(false)
             .show()
+    }
+}
+
+@Composable
+fun MainApp(startDestination: String) {
+    val navController = rememberNavController()
+    // Определяем текущий маршрут
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val authRoutes = listOf("login", "registration")
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    // Создаем drawerState в композируемом контексте
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    if (currentBackStackEntry?.destination?.route == null ||
+        currentBackStackEntry!!.destination.route in authRoutes
+    ) {
+        // Экраны авторизации – без бокового меню
+        Scaffold { innerPadding ->
+            AppNavHost(
+                navController = navController,
+                startDestination = startDestination,
+                modifier = Modifier.padding(innerPadding),
+                onDrawerClicked = {} // не используется для auth-экранов
+            )
+        }
+    } else {
+        // Остальные экраны – с Drawer
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                DrawerContent(
+                    onDestinationClicked = { route ->
+                        scope.launch { drawerState.close() }
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onExitClicked = {
+                        val prefs: SharedPreferences =
+                            context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+                        prefs.edit { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
+                        scope.launch { drawerState.close() }
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    }
+                )
+            }
+        ) {
+            AppNavHost(
+                navController = navController,
+                startDestination = startDestination,
+                onDrawerClicked = { scope.launch { drawerState.open() } }
+            )
+        }
     }
 }
