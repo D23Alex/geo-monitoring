@@ -1,50 +1,59 @@
 package com.example.mobile_app
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.Manifest
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.mobile_app.location.LocationService
 import com.example.mobile_app.ui.DrawerContent
 import com.example.mobile_app.ui.navigation.AppNavHost
 import com.example.mobile_app.ui.theme.MobileAppTheme
+import com.example.mobile_app.viewmodel.MainViewModel
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.single.PermissionListener
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.coroutines.launch
-import kotlin.collections.contains
 
 class MainActivity : ComponentActivity() {
 
     companion object {
         const val PREFS_NAME = "auth"
-        const val KEY_USERNAME = "username"
-        const val KEY_PASSWORD = "password"
-        const val KEY_ROLE = "role"
         const val KEY_IS_LOGGED_IN = "isLoggedIn"
         const val TAG = "MainActivity"
     }
@@ -66,18 +75,18 @@ class MainActivity : ComponentActivity() {
 
         // Инициализация SharedPreferences с дефолтными значениями
         val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        if (!prefs.contains(KEY_USERNAME)) {
-            prefs.edit().apply {
-                putString(KEY_USERNAME, "login")
-                putString(KEY_PASSWORD, "password")
-                putString(KEY_ROLE, "Бригадир")
-                putBoolean(KEY_IS_LOGGED_IN, false)
-                apply()
-            }
-            Log.d(TAG, "SharedPreferences инициализированы с дефолтными значениями")
-        } else {
-            Log.d(TAG, "SharedPreferences уже содержат данные")
-        }
+//        if (!prefs.contains(KEY_USERNAME)) {
+//            prefs.edit().apply {
+//                putString(KEY_USERNAME, "login")
+//                putString(KEY_PASSWORD, "password")
+//                putString(KEY_ROLE, "Бригадир")
+//                putBoolean(KEY_IS_LOGGED_IN, false)
+//                apply()
+//            }
+//            Log.d(TAG, "SharedPreferences инициализированы с дефолтными значениями")
+//        } else {
+//            Log.d(TAG, "SharedPreferences уже содержат данные")
+//        }
 
         // Проверка и последовательный запрос всех нужных разрешений
         checkAndRequestPermissions()
@@ -208,7 +217,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -230,7 +239,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -252,7 +261,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -275,7 +284,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -298,7 +307,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -320,7 +329,7 @@ class MainActivity : ComponentActivity() {
                     showPermissionDeniedDialog()
                 }
                 override fun onPermissionRationaleShouldBeShown(
-                    permission: com.karumi.dexter.listener.PermissionRequest,
+                    permission: PermissionRequest,
                     token: PermissionToken
                 ) {
                     token.continuePermissionRequest()
@@ -359,59 +368,82 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainApp(startDestination: String) {
-    val navController = rememberNavController()
-    // Определяем текущий маршрут
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val authRoutes = listOf("login", "registration")
+fun MainApp(
+    startDestination: String,
+    mainViewModel: MainViewModel = viewModel()
+) {
+    // Загружаем состояние системы при первом запуске
+    LaunchedEffect(Unit) {
+        mainViewModel.loadSystemState()
+    }
+
+    // Собираем состояние системы
+    val systemState by mainViewModel.systemState.collectAsState()
+
+    // Если данные ещё не загружены, показываем индикатор загрузки с кнопкой «Повторить»
+    if (systemState == null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Загрузка данных...")
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { mainViewModel.loadSystemState() }) {
+                Text("Повторить")
+            }
+        }
+        return
+    }
+
     val context = LocalContext.current
+    // Проверяем состояние авторизации через SharedPreferences
+    val prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+    val isLoggedIn = prefs.getBoolean(MainActivity.KEY_IS_LOGGED_IN, false)
+
+    // Определяем эффективный стартовый маршрут
+    val effectiveStartDestination = if (isLoggedIn) startDestination else "login"
+
+    // Создаем NavController
+    val navController = rememberNavController()
     val scope = rememberCoroutineScope()
-    // Создаем drawerState в композируемом контексте
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    if (currentBackStackEntry?.destination?.route == null ||
-        currentBackStackEntry!!.destination.route in authRoutes
-    ) {
-        // Экраны авторизации – без бокового меню
-        Scaffold { innerPadding ->
-            AppNavHost(
-                navController = navController,
-                startDestination = startDestination,
-                modifier = Modifier.padding(innerPadding),
-                onDrawerClicked = {} // не используется для auth-экранов
-            )
-        }
-    } else {
-        // Остальные экраны – с Drawer
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(
-                    onDestinationClicked = { route ->
-                        scope.launch { drawerState.close() }
-                        navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    onExitClicked = {
-                        val prefs: SharedPreferences =
-                            context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
-                        prefs.edit { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
-                        scope.launch { drawerState.close() }
-                        navController.navigate("login") {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        }
+    // Основной NavHost. Здесь граф будет установлен сразу с effectiveStartDestination,
+    // что исключит вызовы navigate до установки графа.
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(
+                onDestinationClicked = { route ->
+                    scope.launch { drawerState.close() }
+                    // Например, для перехода используем фиксированное значение "brigade" в popUpTo,
+                    // чтобы избежать обращения к navController.graph
+                    navController.navigate(route) {
+                        popUpTo("brigade") { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                )
-            }
-        ) {
-            AppNavHost(
-                navController = navController,
-                startDestination = startDestination,
-                onDrawerClicked = { scope.launch { drawerState.open() } }
+                },
+                onExitClicked = {
+                    prefs.edit { putBoolean(MainActivity.KEY_IS_LOGGED_IN, false) }
+                    scope.launch { drawerState.close() }
+                    navController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                navController = navController
             )
         }
+    ) {
+        AppNavHost(
+            navController = navController,
+            startDestination = effectiveStartDestination,
+            onDrawerClicked = { scope.launch { drawerState.open() } }
+        )
     }
 }

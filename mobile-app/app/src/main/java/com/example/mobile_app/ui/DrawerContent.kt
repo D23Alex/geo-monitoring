@@ -19,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 
 @Composable
 fun DrawerContent(
+    navController: NavHostController,
     onDestinationClicked: (String) -> Unit,
     onExitClicked: () -> Unit
 ) {
@@ -46,24 +48,42 @@ fun DrawerContent(
                 modifier = Modifier.padding(16.dp)
             )
             HorizontalDivider()
-            DrawerItem(label = "Бригада", route = "brigade", onDestinationClicked = onDestinationClicked)
-            DrawerItem(label = "Объекты", route = "objects_list", onDestinationClicked = onDestinationClicked)
-            DrawerItem(label = "Сообщения", route = "messages", onDestinationClicked = onDestinationClicked)
+            DrawerItem(label = "Бригада", route = "brigade", onDestinationClicked = onDestinationClicked, navController = navController)
+            DrawerItem(label = "Объекты", route = "objects_list", onDestinationClicked = onDestinationClicked, navController = navController)
+            DrawerItem(label = "Сообщения", route = "messages", onDestinationClicked = onDestinationClicked, navController = navController)
             Spacer(modifier = Modifier.weight(1f))
             // Кнопка "Выход"
-            DrawerItem(label = "Выход", route = "logout", onDestinationClicked = { onExitClicked() })
+            DrawerItem(label = "Выход", route = "logout", onDestinationClicked = { onExitClicked() }, navController = navController)
         }
     }
 }
 
 @Composable
-fun DrawerItem(label: String, route: String, onDestinationClicked: (String) -> Unit) {
+fun DrawerItem(
+    label: String,
+    route: String,
+    navController: NavHostController,
+    onDestinationClicked: (String) -> Unit,
+    onCustomClick: (() -> Unit)? = null
+) {
     Text(
         text = label,
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onDestinationClicked(route) }
+            .clickable {
+                onDestinationClicked(route)
+                if (route == "logout") {
+                    onCustomClick?.invoke()
+                } else {
+                    // Навигация с очисткой стека, чтобы вне зависимости от текущего пути переход всегда выполнялся
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = false }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
             .padding(16.dp)
     )
 }

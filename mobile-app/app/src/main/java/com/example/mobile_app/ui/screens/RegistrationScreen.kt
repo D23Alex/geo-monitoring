@@ -1,5 +1,6 @@
 package com.example.mobile_app.ui.screens
 
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.mobile_app.repository.ClientDataRepository
+import androidx.core.content.edit
 
 @Composable
 fun RegistrationScreen(
@@ -57,6 +59,8 @@ fun RegistrationScreen(
                 if (username.isNotBlank() && password.isNotBlank()) {
                     // Пример: clientId генерируется или приходит с сервера, MAC и IMEI можно получить через системные API
                     clientRepo.saveClientData(clientId = 123L, login = username, password = password, mac = "AA:BB:CC:DD:EE:FF", imei = "123456789012345")
+                    val prefs = context.getSharedPreferences("auth", MODE_PRIVATE)
+                    prefs.edit() { putBoolean("isLoggedIn", true) }
                     onRegistrationSuccess()
                 } else {
                     errorMsg = "Введите корректные данные"

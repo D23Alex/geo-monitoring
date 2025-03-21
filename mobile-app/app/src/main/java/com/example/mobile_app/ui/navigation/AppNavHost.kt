@@ -25,7 +25,9 @@ import com.example.mobile_app.ui.screens.ObjectTasksScreen
 import com.example.mobile_app.ui.screens.ObjectsListScreen
 import com.example.mobile_app.ui.screens.RegistrationScreen
 import com.example.mobile_app.ui.screens.TaskAssignmentScreen
-import com.example.mobile_app.ui.screens.WorkerAssignmentScreen
+import com.example.mobile_app.ui.screens.TaskDetailsScreen
+import com.example.mobile_app.ui.screens.WorkerAssignmentScreenForTask
+import com.example.mobile_app.ui.screens.WorkerAssignmentScreenForWorker
 import com.example.mobile_app.ui.screens.WorkerProfileScreen
 
 
@@ -37,7 +39,6 @@ fun AppNavHost(
     modifier: Modifier = Modifier
 ) {
     NavHost(navController = navController, startDestination = startDestination, modifier = modifier) {
-        // Главный экран "brigade" – без кнопки "Назад", с меню
         composable("brigade") {
             ScreenWithAppBar(
                 title = "Бригада",
@@ -48,7 +49,6 @@ fun AppNavHost(
                 BrigadeScreen(navController = navController)
             }
         }
-        // Экран объектов
         composable("objects_list") {
             ScreenWithAppBar(
                 title = "Список объектов",
@@ -59,7 +59,6 @@ fun AppNavHost(
                 ObjectsListScreen(navController = navController)
             }
         }
-        // Экран сообщений
         composable("messages") {
             ScreenWithAppBar(
                 title = "Сообщения",
@@ -70,7 +69,6 @@ fun AppNavHost(
                 MessagesScreen()
             }
         }
-        // Экран входа – можно оставить без верхней шапки, если нужно
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
@@ -83,7 +81,6 @@ fun AppNavHost(
                 }
             )
         }
-        // Экран регистрации
         composable("registration") {
             ScreenWithAppBar(
                 title = "Регистрация",
@@ -105,7 +102,6 @@ fun AppNavHost(
                 )
             }
         }
-        // Профиль рабочего
         composable("worker_profile/{workerName}") { backStackEntry ->
             val workerName = backStackEntry.arguments?.getString("workerName")
             ScreenWithAppBar(
@@ -117,31 +113,6 @@ fun AppNavHost(
                 WorkerProfileScreen(navController = navController, workerName = workerName)
             }
         }
-        // Экран назначения работника с параметрами
-        composable("assign_worker/{workerName}/{objectName}") { backStackEntry ->
-            val workerName = backStackEntry.arguments?.getString("workerName")
-            val objectName = backStackEntry.arguments?.getString("objectName")
-            ScreenWithAppBar(
-                title = "Назначение работника",
-                showBackButton = true,
-                navController = navController,
-                onDrawerClicked = onDrawerClicked
-            ) {
-                WorkerAssignmentScreen(workerName = workerName, objectName = objectName)
-            }
-        }
-        // Экран назначения работника без параметров
-        composable("assign_worker") {
-            ScreenWithAppBar(
-                title = "Назначение работника",
-                showBackButton = true,
-                navController = navController,
-                onDrawerClicked = onDrawerClicked
-            ) {
-                WorkerAssignmentScreen(workerName = null, objectName = null)
-            }
-        }
-        // Страница объекта
         composable("object_details/{objectId}") { backStackEntry ->
             val objectId = backStackEntry.arguments?.getString("objectId") ?: "0"
             ScreenWithAppBar(
@@ -153,7 +124,6 @@ fun AppNavHost(
                 ObjectDetailsScreen(objectId = objectId, navController = navController)
             }
         }
-        // Страница задач для объекта
         composable("object_tasks/{objectId}") { backStackEntry ->
             val objectId = backStackEntry.arguments?.getString("objectId") ?: "0"
             ScreenWithAppBar(
@@ -165,7 +135,41 @@ fun AppNavHost(
                 ObjectTasksScreen(objectId = objectId)
             }
         }
-        // Экран назначения задачи
+        composable("task_details/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId") ?: "0"
+            ScreenWithAppBar(
+                title = "Детали задачи",
+                showBackButton = true,
+                navController = navController,
+                onDrawerClicked = onDrawerClicked
+            ) {
+                TaskDetailsScreen(taskId = taskId, navController = navController)
+            }
+        }
+        composable("assign_worker_to_task/{taskId}") { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getString("taskId") ?: "0"
+            ScreenWithAppBar(
+                title = "Назначение работника на задачу",
+                showBackButton = true,
+                navController = navController,
+                onDrawerClicked = onDrawerClicked
+            ) {
+                // Этот экран будет использоваться для назначения работника из TaskDetailsScreen
+                WorkerAssignmentScreenForTask(taskId = taskId)
+            }
+        }
+        composable("assign_worker_to_task_by_worker/{workerId}") { backStackEntry ->
+            val workerId = backStackEntry.arguments?.getString("workerId") ?: "0"
+            ScreenWithAppBar(
+                title = "Назначение задачи для рабочего",
+                showBackButton = true,
+                navController = navController,
+                onDrawerClicked = onDrawerClicked
+            ) {
+                // Этот экран используется для назначения задачи, инициированного из профиля рабочего
+                WorkerAssignmentScreenForWorker(workerId = workerId)
+            }
+        }
         composable("assign_task") {
             ScreenWithAppBar(
                 title = "Назначение задачи",
@@ -178,6 +182,7 @@ fun AppNavHost(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

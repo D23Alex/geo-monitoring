@@ -1,5 +1,6 @@
 package com.example.mobile_app.ui.screens
 
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.mobile_app.MainActivity
 import com.example.mobile_app.repository.ClientDataRepository
+import androidx.core.content.edit
 
 @Composable
 fun LoginScreen(
@@ -55,6 +58,9 @@ fun LoginScreen(
         Button(onClick = {
             val storedData = clientRepo.getClientData()
             if (storedData != null && username == storedData.login && password == storedData.password) {
+                clientRepo
+                val prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, MODE_PRIVATE)
+                prefs.edit() { putBoolean(MainActivity.KEY_IS_LOGGED_IN, true) }
                 onLoginSuccess()
             } else {
                 errorMsg = "Неверные учетные данные"

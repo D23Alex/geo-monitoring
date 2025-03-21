@@ -1,6 +1,7 @@
 package com.example.mobile_app.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobile_app.model.Event
@@ -20,8 +21,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.getCurrentState().onSuccess { state ->
                 _systemState.value = state
-            }.onFailure {
-                // Обработка ошибки (например, через уведомление или логирование)
+            }.onFailure { error ->
+                // Логируем ошибку и устанавливаем dummy state для отладки
+                Log.e("MainViewModel", ": ${error.message}")
+                _systemState.value = com.example.mobile_app.debug.DebugData.dummySystemState
             }
         }
     }
