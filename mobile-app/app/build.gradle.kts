@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
+//    kotlin("jvm") version "2.1.10"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -28,19 +30,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15" // укажите актуальную версию
-    }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.15" // укажите актуальную версию
+//    }
     composeCompiler {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
 //        stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
@@ -58,6 +60,14 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.play.services.location)
+    implementation(libs.dexter)
+
+    implementation(libs.androidx.security.crypto.ktx.v110alpha06)
+    implementation(libs.androidx.work.runtime.ktx)
 
 //    implementation(libs.androidx.activity.compose)
 //    implementation(libs.androidx.ui)
