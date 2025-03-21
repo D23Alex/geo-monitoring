@@ -22,10 +22,19 @@ import java.util.Set;
 @SuperBuilder
 public class WorkerGroupCreationEvent extends Event {
     private Long foremanId;
-    @ElementCollection //TODO: заменить во всех ивентах Worker на передачу id
+    private String name;
+    @ElementCollection
     private Set<Long> workerIds;
     Instant groupActiveFrom;
     Instant groupActiveTo;
+
+    @PrePersist
+    @PreUpdate
+    private void validateWorkerIds() {
+        if (workerIds.contains(foremanId)) {
+            throw new IllegalArgumentException("Бригадир не может быть рабочим в этой группе.");
+        }
+    }
 
     @Override
     public Set<String> oldStateIssues(SystemState oldState) {
@@ -47,6 +56,7 @@ public class WorkerGroupCreationEvent extends Event {
                 .id(newGroupId)
                 .workerIds(workerIds)
                 .foremanId(foremanId)
+                .name(name)
                 .activeInterval(new Interval(groupActiveFrom, groupActiveTo))
                 .createdAt(getTimestamp())
                 .build();

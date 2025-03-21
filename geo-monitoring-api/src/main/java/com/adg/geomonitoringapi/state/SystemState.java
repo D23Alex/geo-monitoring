@@ -34,7 +34,6 @@ public final class SystemState {
     public Set<Long> activeTaskIds(Instant t) {
         return activeTasks(t).stream().map(TaskState::getId).collect(Collectors.toSet());
     }
-
     /**
      * Узнать задачи, которые должны начать и закончить выполняться за определенный период
      * @param interval заданный интервал
@@ -150,6 +149,12 @@ public final class SystemState {
                 .collect(Collectors.toSet());
     }
 
+    public Set<TaskState> tasksAtLocation(Long locationId) {
+        return tasks.values().stream()
+                .filter(task -> Objects.equals(task.getLocationId(), locationId))
+                .collect(Collectors.toSet());
+    }
+
     /**
      * @param workerId id
      * @param t момент времени
@@ -209,17 +214,43 @@ public final class SystemState {
                 ));
     }
 
+    /**
+     * @param p точка
+     * @return список локиций, содержащих точку
+     */
     public Set<LocationState> locationsContainingPoint(Point p) {
         return locations.values().stream()
                 .filter(l -> Geometry.isPointInPolygon(p, l.getPoints()))
                 .collect(Collectors.toSet());
     }
 
-    public Map<Long, Set<LocationState>> lastKnownLocationsForEachWorker() {
+    /**
+     * @param p точка
+     * @return список локиций, содержащих точку или находящихся недалеко от неё
+     */
+    public Set<LocationState> locationsContainingOrNearPoint(Point p, Double maxDistance) {
+        return locations.values().stream()
+                .filter(l -> Geometry.isPointInOrNearPolygon(p, l.getPoints(), maxDistance))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * возвращает множество так как локации могут пересекаться
+     * @return список локиций, где работник находился в последний раз, что от него поступал апдейт метоположения
+     */
+    public Map<Long, Set<LocationState>> lastKnownExactLocationsForEachWorker() {
         return lastKnownWorkerPositions().entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> locationsContainingPoint(entry.getValue().orElse(Point.SOME_FAR_AWAY_POINT))
+                ));
+    }
+
+    public Map<Long, Set<LocationState>> lastKnownApproximateLocationsForEachWorker(Double maxDistance) {
+        return lastKnownWorkerPositions().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> locationsContainingOrNearPoint(entry.getValue().orElse(Point.SOME_FAR_AWAY_POINT), maxDistance)
                 ));
     }
 

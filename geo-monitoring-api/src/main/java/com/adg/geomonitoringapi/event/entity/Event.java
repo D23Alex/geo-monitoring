@@ -38,6 +38,11 @@ public abstract class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant timestamp;
+  
+    @PreUpdate
+    private void validateImmutability() {
+        throw new UnsupportedOperationException("Ивенты нельзя изменять.");
+    }
 
     public boolean canBeApplied(SystemState state) {
         return oldStateIssues(state).isEmpty();

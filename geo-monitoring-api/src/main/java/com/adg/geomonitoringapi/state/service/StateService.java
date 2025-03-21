@@ -2,10 +2,12 @@ package com.adg.geomonitoringapi.state.service;
 
 import com.adg.geomonitoringapi.event.entity.Event;
 import com.adg.geomonitoringapi.state.SystemState;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.stream.Stream;
 
+@Service
 public interface StateService {
     SystemState getLatestState();
 
