@@ -20,19 +20,16 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @With
 public final class SystemState {
-
-    public static class StateUpdateException extends RuntimeException {
-        public StateUpdateException(String s) {
-        }
-    }
-
     private Map<Long, GroupState> groups;
     private Map<Long, LocationState> locations;
     private Map<Long, TaskState> tasks;
     private Map<Long, WorkerState> workers;
     private Map<Long, WorkAbsenceState> absences;
-    private Event lastEvent;
+    private Map<Long, Set<String>> issuesWithEvents;
+    private Event lastProcessedEvent;
+    private Event lastAppliedEvent;
     private Long eventsApplied = 0L;
+    private Long eventsProcessed = 0L;
 
     public Set<Long> activeTaskIds(Instant t) {
         return activeTasks(t).stream().map(TaskState::getId).collect(Collectors.toSet());
@@ -298,7 +295,10 @@ public final class SystemState {
                 Map.of(),
                 Map.of(),
                 Map.of(),
+                Map.of(),
                 NothingHappenedEvent.builder().id(0L).timestamp(Instant.EPOCH).build(),
+                NothingHappenedEvent.builder().id(0L).timestamp(Instant.EPOCH).build(),
+                0L,
                 0L
         );
     }

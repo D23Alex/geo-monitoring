@@ -4,6 +4,7 @@ import com.adg.geomonitoringapi.event.AbsenceReason;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.WorkAbsenceState;
 import com.adg.geomonitoringapi.util.Interval;
+import com.adg.geomonitoringapi.util.Util;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,8 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -26,16 +29,18 @@ public class WorkAbsenceRequestEvent extends Event {
     Long workerId;
 
     @Override
+    public Set<String> oldStateIssues(SystemState oldState) {
+        return Util.construct(Map.of(
+                () -> !oldState.getWorkers().containsKey(workerId),
+                "Невозможно создать пропуск работы: работник с id " + workerId + " не существует",
+                () -> oldState.getAbsences().containsKey(getId()),
+                "Невозможно создать пропуск работы: пропуск работы с id " + getId() + " уже существует"
+        ));
+    }
+
+    @Override
     public SystemState apply(SystemState oldState) {
         Long newAbsenceId = getId();
-
-        if (oldState.getAbsences().containsKey(newAbsenceId))
-            throw new SystemState.StateUpdateException("Невозможно создать пропуск работы: пропуск работы с id "
-                    + newAbsenceId + " уже существует");
-
-        if (!oldState.getWorkers().containsKey(workerId))
-            throw new SystemState.StateUpdateException("Невозможно создать пропуск работы: работник с id "
-                    + workerId + " уже существует");
 
         var newAbsences = new HashMap<>(oldState.getAbsences());
         newAbsences.put(newAbsenceId,

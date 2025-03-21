@@ -8,6 +8,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,14 +38,35 @@ public abstract class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant timestamp;
-
+  
     @PreUpdate
     private void validateImmutability() {
         throw new UnsupportedOperationException("Ивенты нельзя изменять.");
     }
 
-    public SystemState updateState(SystemState oldState) {
-        return apply(oldState).withLastEvent(this).withEventsApplied(oldState.getEventsApplied() + 1);
+    public boolean canBeApplied(SystemState state) {
+        return oldStateIssues(state).isEmpty();
+    }
+
+    public abstract Set<String> oldStateIssues(SystemState oldState);
+
+    public final SystemState updateState(SystemState oldState) {
+        var newIssues = new HashMap<>(oldState.getIssuesWithEvents());
+        newIssues.put(id, oldStateIssues(oldState));
+
+        if (!canBeApplied(oldState)) {
+            return oldState
+                    .withLastProcessedEvent(this)
+                    .withEventsProcessed(oldState.getEventsProcessed() + 1)
+                    .withIssuesWithEvents(newIssues);
+        }
+
+        return apply(oldState)
+                .withLastProcessedEvent(this)
+                .withLastAppliedEvent(this)
+                .withEventsProcessed(oldState.getEventsProcessed() + 1)
+                .withEventsApplied(oldState.getEventsApplied() + 1)
+                .withIssuesWithEvents(newIssues);
     }
 
     public abstract SystemState apply(SystemState oldState);

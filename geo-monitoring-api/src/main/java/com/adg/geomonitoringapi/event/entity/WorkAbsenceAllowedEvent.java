@@ -3,6 +3,7 @@ package com.adg.geomonitoringapi.event.entity;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.WorkAbsenceState;
 import com.adg.geomonitoringapi.util.Interval;
+import com.adg.geomonitoringapi.util.Util;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -27,11 +30,15 @@ public class WorkAbsenceAllowedEvent extends Event {
 
 
     @Override
-    public SystemState apply(SystemState oldState) {
-        if (oldState.getAbsences().containsKey(absenceId))
-            throw new SystemState.StateUpdateException("Невозможно одобрить пропуск работы: пропуск работы с id "
-                    + absenceId + " не существует");
+    public Set<String> oldStateIssues(SystemState oldState) {
+        return Util.construct(Map.of(
+                () -> !oldState.getAbsences().containsKey(absenceId),
+                "Невозможно одобрить пропуск работы: пропуск работы с id " + absenceId + " не существует"
+        ));
+    }
 
+    @Override
+    public SystemState apply(SystemState oldState) {
         WorkAbsenceState newAbsence = oldState.getAbsences().get(absenceId)
                 .withAbsenceAllowed(true)
                 .withVerdictComment(verdictComment);

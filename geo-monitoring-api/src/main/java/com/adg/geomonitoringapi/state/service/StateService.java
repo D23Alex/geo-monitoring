@@ -21,7 +21,7 @@ public interface StateService {
 
     default SystemState applyEvents(SystemState initialState, Stream<Event> eventsOrderedByTimestamp) {
         return eventsOrderedByTimestamp
-                .filter(event -> event.getTimestamp().isAfter(initialState.getLastEvent().getTimestamp()))
+                .filter(event -> event.getTimestamp().isAfter(initialState.getLastProcessedEvent().getTimestamp()))
                 .reduce(SystemState.initial(),
                         (state, event) -> event.updateState(state),
                         (s1, s2) -> s2);

@@ -6,6 +6,7 @@ import com.adg.geomonitoringapi.state.CompletionCriteriaState;
 import com.adg.geomonitoringapi.state.SystemState;
 import com.adg.geomonitoringapi.state.TaskState;
 import com.adg.geomonitoringapi.util.Interval;
+import com.adg.geomonitoringapi.util.Util;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -37,13 +38,20 @@ public class TaskAssignedEvent extends Event {
     private Instant activeTo;
 
     @Override
-    public SystemState apply(SystemState oldState) {
-        if (!oldState.getLocations().containsKey(locationId))
-            throw new SystemState.StateUpdateException("Невозможно создать задачу: локация с id "
-                    + locationId + " не существует");
+    public Set<String> oldStateIssues(SystemState oldState) {
+        return Util.construct(Map.of(
+                () -> !oldState.getLocations().containsKey(locationId),
+                "Невозможно создать задачу: локация с id " + locationId + " не существует",
+                () -> !oldState.getWorkers().keySet().containsAll(assignedWorkers),
+                "Невозможно создать задачу: работник не найден",
+                () -> oldState.getTasks().containsKey(getId()),
+                "Невозможно создать задачу: задача с id " + getId() + " уже существует"
+        ));
+    }
 
-        if (!oldState.getWorkers().keySet().containsAll(assignedWorkers))
-            throw new SystemState.StateUpdateException("Невозможно создать задачу: работник не найден");
+    @Override
+    public SystemState apply(SystemState oldState) {
+        Long newTaskId = getId();
 
         Map<Integer, CompletionCriteriaState> completionCriteriaStates = new HashMap<>();
         for (int i = 0; i < completionCriteria.size(); i++) {
@@ -58,8 +66,6 @@ public class TaskAssignedEvent extends Event {
             );
         }
 
-        Long newTaskId = getId();
-
         TaskState newTask = TaskState.builder()
                 .id(newTaskId)
                 .assignedWorkers(assignedWorkers)
@@ -70,10 +76,6 @@ public class TaskAssignedEvent extends Event {
                 .description(description)
                 .status(TaskStatus.CREATED)
                 .build();
-
-        if (oldState.getTasks().containsKey(newTaskId))
-            throw new SystemState.StateUpdateException("Невозможно создать задачу: задача с id "
-                    + newTaskId + " уже существует");
 
         var newTasks = new HashMap<>(oldState.getTasks());
         newTasks.put(newTaskId, newTask);

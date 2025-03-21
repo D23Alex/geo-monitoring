@@ -96,7 +96,7 @@ public class SnapshottedStateService implements StateService {
     public SystemState atInstant(Instant t) {
         SystemState snapshot = optimalLatestSnapshotBefore(t);
         var events = eventRepository
-                .findAllByTimestampBetweenOrderByTimestampAsc(snapshot.getLastEvent().getTimestamp(), t);
+                .findAllByTimestampBetweenOrderByTimestampAsc(snapshot.getLastProcessedEvent().getTimestamp(), t);
 
         List<Event> newEvents = Util.atomicallyExtractAll(newEventsQueue);
         Optional<Event> leastRecentUnhandledEvent = newEvents.stream().min(Comparator.comparing(Event::getTimestamp));
@@ -109,7 +109,7 @@ public class SnapshottedStateService implements StateService {
         snapshotRepository.deleteAllByTimestampAfter(leastRecentUnhandledEvent.get().getTimestamp());
 
         boolean snapshotIsOutdated =
-                leastRecentUnhandledEvent.get().getTimestamp().isBefore(snapshot.getLastEvent().getTimestamp());
+                leastRecentUnhandledEvent.get().getTimestamp().isBefore(snapshot.getLastProcessedEvent().getTimestamp());
         if (snapshotIsOutdated)
             return atInstant(t);
 
@@ -123,20 +123,20 @@ public class SnapshottedStateService implements StateService {
         states = states.stream()
                 .filter(state ->
                         // убрать невалидные более снапшоты
-                        state.getLastEvent().getTimestamp().isBefore(t)
+                        state.getLastProcessedEvent().getTimestamp().isBefore(t)
                                 // убрать слишком старые снапшоты
-                                && state.getEventsApplied() >= totalEvents.get() - IN_MEMORY_SNAPSHOT_MAX_AGE_IN_EVENTS)
-                .sorted(Comparator.comparingLong(SystemState::getEventsApplied).reversed())
+                                && state.getEventsProcessed() >= totalEvents.get() - IN_MEMORY_SNAPSHOT_MAX_AGE_IN_EVENTS)
+                .sorted(Comparator.comparingLong(SystemState::getEventsProcessed).reversed())
                 .limit(IN_MEMORY_SNAPSHOT_MAX_AMOUNT)
                 .collect(Collectors.toSet());
     }
 
     private SystemState optimalLatestSnapshotBefore(Instant t) {
         Optional<SystemState> latestInMemorySnapshot = states.stream()
-                .filter(state -> state.getLastEvent().getTimestamp().isBefore(t))
-                .max(Comparator.comparingLong(SystemState::getEventsApplied));
+                .filter(state -> state.getLastProcessedEvent().getTimestamp().isBefore(t))
+                .max(Comparator.comparingLong(SystemState::getEventsProcessed));
 
-        if (latestInMemorySnapshot.isPresent() && latestInMemorySnapshot.get().getEventsApplied()
+        if (latestInMemorySnapshot.isPresent() && latestInMemorySnapshot.get().getEventsProcessed()
                 > totalEvents.get() - PREFERRED_IN_MEMORY_SNAPSHOT_AGE_IN_EVENTS)
             return latestInMemorySnapshot.get();
 
@@ -145,7 +145,7 @@ public class SnapshottedStateService implements StateService {
                 parseFromJson(latestSnapshotFromDisk.get().getStateJson()) : SystemState.initial();
 
         boolean isInMemoryStateNewer = latestInMemorySnapshot.isPresent()
-                && latestInMemorySnapshot.get().getEventsApplied() > stateFromDisk.getEventsApplied();
+                && latestInMemorySnapshot.get().getEventsProcessed() > stateFromDisk.getEventsProcessed();
 
         return isInMemoryStateNewer ? latestInMemorySnapshot.get() : stateFromDisk;
     }
@@ -161,14 +161,14 @@ public class SnapshottedStateService implements StateService {
      * @param state состояние-кандидат на сохранение
      */
     private synchronized void saveStateToDiskIfLatestIsTooOld(SystemState state) {
-        if (state.getEventsApplied() < eventsInLatestOnDiskSnapshot + MAX_LATEST_ON_DISK_SNAPSHOT_AGE)
+        if (state.getEventsProcessed() < eventsInLatestOnDiskSnapshot + MAX_LATEST_ON_DISK_SNAPSHOT_AGE)
             return;
 
         try {
             snapshotRepository.save(Snapshot.builder()
-                    .timestamp(state.getLastEvent().getTimestamp())
+                    .timestamp(state.getLastProcessedEvent().getTimestamp())
                     .stateJson(objectMapper.writeValueAsString(state)).build());
-            eventsInLatestOnDiskSnapshot = state.getEventsApplied();
+            eventsInLatestOnDiskSnapshot = state.getEventsProcessed();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
