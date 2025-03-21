@@ -1,7 +1,6 @@
 package com.example.mobile_app
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
@@ -11,6 +10,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.example.mobile_app.location.LocationService
 import com.example.mobile_app.ui.theme.MobileAppTheme
@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity() {
     private val fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
     // FOREGROUND_SERVICE_LOCATION отсутствует в Manifest.permission, поэтому задаём вручную:
     private val foregroundServiceLocationPermission = "android.permission.FOREGROUND_SERVICE_LOCATION"
+    @RequiresApi(Build.VERSION_CODES.Q)
     private val backgroundLocationPermission = Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    @RequiresApi(Build.VERSION_CODES.P)
     private val foregroundServicePermission = Manifest.permission.FOREGROUND_SERVICE
     private val internetPermission = Manifest.permission.INTERNET
 
@@ -45,7 +47,7 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onCreate вызван")
 
         // Инициализация SharedPreferences с дефолтными значениями
-        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         if (!prefs.contains(KEY_USERNAME)) {
             prefs.edit().apply {
                 putString(KEY_USERNAME, "login")
@@ -109,7 +111,7 @@ class MainActivity : ComponentActivity() {
                     onNegative = { showPermissionDeniedDialog() }
                 )
             }
-            !hasForegroundServicePermission() -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && !hasForegroundServicePermission() -> {
                 showPermissionRequestDialog(
                     title = "Требуется разрешение на foreground-сервис",
                     message = "Для корректной работы приложения необходимо разрешить запуск foreground-сервиса.",
@@ -145,6 +147,7 @@ class MainActivity : ComponentActivity() {
         } else true
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun hasForegroundServicePermission(): Boolean =
         ContextCompat.checkSelfPermission(this, foregroundServicePermission) == PackageManager.PERMISSION_GRANTED
 
@@ -240,6 +243,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Запрос разрешения ACCESS_BACKGROUND_LOCATION
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun requestBackgroundLocationPermission() {
         Dexter.withContext(this)
             .withPermission(backgroundLocationPermission)
@@ -262,6 +266,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Запрос разрешения FOREGROUND_SERVICE
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun requestForegroundServicePermission() {
         Dexter.withContext(this)
             .withPermission(foregroundServicePermission)
